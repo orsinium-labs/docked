@@ -1,8 +1,6 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from ._instructions import Instruction, FROM, ARG
+from ._instructions import Instruction, FROM, ARG
 
 
 class Stage:
@@ -14,6 +12,13 @@ class Stage:
 
     def as_str(self) -> str:
         return '\n'.join(step.as_str() for step in self.steps)
+
+    @property
+    def name(self) -> str | None:
+        for step in self.steps:
+            if isinstance(step, FROM):
+                return step.name
+        return None
 
     @property
     def min_version(self) -> str:
