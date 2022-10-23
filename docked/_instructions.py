@@ -68,7 +68,7 @@ class FROM(Instruction):
     def as_str(self) -> str:
         result = 'FROM'
         if self.platform:
-            result += f' --digest={self.platform}'
+            result += f' --platform={self.platform}'
         result += f' {self.image}'
         if self.tag:
             result += f':{self.tag}'
@@ -133,9 +133,9 @@ class RUN(Instruction):
         if self.security != 'sandbox':
             result += f' --security={self.security}'
         if isinstance(self.first, str):
-            result += ' ' + '&& \\\n    '.join((self.first,) + self.rest)
+            result += ' ' + ' && \\\n    '.join((self.first,) + self.rest)
         else:
-            result = ' ' + json.dumps(self.first)
+            result += ' ' + json.dumps(self.first)
         return result
 
     @property
@@ -168,20 +168,18 @@ class LABEL(Instruction):
 
     https://docs.docker.com/engine/reference/builder/#label
     """
-    __slots__ = ('name', 'default')
+    __slots__ = ('name', 'value')
 
-    def __init__(self, name: str, default: str | None = None) -> None:
+    def __init__(self, name: str, value: str) -> None:
         self.name = name
-        self.default = default
+        self.value = value
 
     def as_str(self) -> str:
         result = f'LABEL {self.name}'
-        default = self.default
-        if default is not None:
-            if not default or ' ' in default:
-                default = f'"{default}"'
-            default = default.replace('\n', '\\\n')
-            result += f'={default}'
+        value = self.value
+        if not value or ' ' in value:
+            value = f'"{value}"'
+        result += f'={value}'
         return result
 
 
@@ -196,7 +194,7 @@ class EXPOSE(Instruction):
     """
     __slots__ = ('port', 'protocol')
 
-    def __init__(self, port: int, protocol: str = 'tcp') -> None:
+    def __init__(self, port: int, protocol: Literal['tcp', 'udp'] = 'tcp') -> None:
         self.port = port
         self.protocol = protocol
 
@@ -221,11 +219,9 @@ class ENV(Instruction):
     def as_str(self) -> str:
         result = f'ENV {self.key}'
         value = self.value
-        if value is not None:
-            if not value or ' ' in value:
-                value = f'"{value}"'
-            value = value.replace('\n', '\\\n')
-            result += f'={value}'
+        if not value or ' ' in value:
+            value = f'"{value}"'
+        result += f'={value}'
         return result
 
 
@@ -239,7 +235,7 @@ class ADD(Instruction):
 
     https://docs.docker.com/engine/reference/builder/#add
     """
-    __slots__ = ('src', 'dst', 'chown', 'checksum', 'keep_git_dir', 'link')
+    __slots__ = ('src', 'dst', 'chown', 'checksum', 'keep_git_dir', 'link', 'checksum_algoritm')
 
     def __init__(
         self,
@@ -247,6 +243,7 @@ class ADD(Instruction):
         dst: str | PosixPath,
         *,
         chown: str | int | None = None,
+        checksum_algoritm: Literal['sha256', 'sha384', 'sha512', 'blake3'] = 'sha256',
         checksum: str | None = None,
         keep_git_dir: bool = False,
         link: bool = False,
@@ -256,6 +253,7 @@ class ADD(Instruction):
         self.chown = chown
         self.checksum = checksum
         self.keep_git_dir = keep_git_dir
+        self.checksum_algoritm = checksum_algoritm
         self.link = link
 
     def as_str(self) -> str:
@@ -263,7 +261,7 @@ class ADD(Instruction):
         if self.chown:
             result += f' --chown={self.chown}'
         if self.checksum:
-            result += f' --checksum={self.checksum}'
+            result += f' --checksum={self.checksum_algoritm}:{self.checksum}'
         if self.keep_git_dir:
             result += ' --keep-git-dir=true'
         if self.link:
@@ -319,7 +317,7 @@ class COPY(Instruction):
         self.link = link
 
     def as_str(self) -> str:
-        result = 'ADD'
+        result = 'COPY'
         if self.chown:
             result += f' --chown={self.chown}'
         if self.link:
@@ -381,7 +379,7 @@ class VOLUME(Instruction):
         self.paths = paths
 
     def as_str(self) -> str:
-        result = 'VOLUME '
+        result = 'VOLUME'
         parts = [str(path) for path in self.paths]
         return f'{result} {json_if_spaces(parts)}'
 
@@ -436,7 +434,7 @@ class ONBUILD(Instruction):
         self.trigger = trigger
 
     def as_str(self) -> str:
-        return f'ONBOULD {self.trigger.as_str()}'
+        return f'ONBUILD {self.trigger.as_str()}'
 
 
 class STOPSIGNAL(Instruction):
