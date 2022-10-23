@@ -1,6 +1,10 @@
 from __future__ import annotations
+from pathlib import Path
+import subprocess
+import sys
+from tempfile import NamedTemporaryFile
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterator, TextIO, overload
 
 if TYPE_CHECKING:
     from ._stage import Stage
@@ -10,6 +14,8 @@ DEFAULT_CHANNEL = 'docker/dockerfile'
 
 
 class Image:
+    """A Docker image. Consists of one or more Stages.
+    """
     __slots__ = ('stages', 'syntax_channel', 'syntax_version', 'escape')
 
     def __init__(
@@ -28,17 +34,82 @@ class Image:
 
     @property
     def min_version(self) -> str:
+        """The minimal Dockerfile version required.
+
+        Determined based on the instructions and their arguments used.
+        """
         versions = (stage.min_version for stage in self.stages)
         return max(versions, default='1.0')
 
     @property
     def syntax(self) -> str:
-        return f'{self.syntax_channel}:{self.min_version}'
+        """Syntax of the Dockerfile to use.
+
+        If no `syntax_version` provided, the `min_version` will be used.
+        """
+        version = self.syntax_version or self.min_version
+        return f'{self.syntax_channel}:{version}'
 
     def as_str(self) -> str:
-        result: list[str] = [f'# syntax={self.syntax}\nescape={self.escape}']
-        result.extend(stage.as_str() for stage in self.stages)
-        return '\n\n'.join(result)
+        """Generate Dockerfile.
+        """
+        return '\n'.join(self.iter_lines())
+
+    def iter_lines(self) -> Iterator[str]:
+        """Iterate over lines of Dockerfile.
+
+        Useful for writing a big Dockerfile in a file or a stream.
+        """
+        yield f'# syntax={self.syntax}'
+        yield f'# escape={self.escape}'
+        for stage in self.stages:
+            yield ''
+            yield stage.as_str()
+
+    @overload
+    def save(self, path: Path) -> None:
+        pass
+
+    @overload
+    def save(self, path: None = None) -> Path:
+        pass
+
+    def save(self, path: Path | None = None) -> Path | None:
+        """Save Dockerfile in the given file path.
+
+        If no path provided, save into a temporary file and return the file path.
+        """
+        result = None
+        if path is None:
+            tmp_path = NamedTemporaryFile(delete=False)
+            path = Path(tmp_path.name)
+            result = path
+        with path.open('w', encoding='utf8') as stream:
+            for line in self.iter_lines():
+                print(line, file=stream)
+        return result
+
+    def build(
+        self,
+        args: list[str] | None = None,
+        binary: str = 'docker',
+        exit_on_failure: bool = True,
+        stdout: TextIO = sys.stdout,
+        stderr: TextIO = sys.stderr,
+    ) -> int:
+        """Build the image using syscalls to the Docker CLI.
+        """
+        if args is None:
+            args = sys.argv[1:]
+        with NamedTemporaryFile(mode='w+') as tmp_path:
+            for line in self.iter_lines():
+                print(line, file=tmp_path)
+            tmp_path.flush()
+            cmd = [binary, 'buildx', 'build', '-f', tmp_path.name, *args]
+            result = subprocess.run(cmd, stdout=stdout, stderr=stderr)
+        if exit_on_failure and result.returncode != 0:
+            sys.exit(result.returncode)
+        return result.returncode
 
     def __str__(self) -> str:
         return self.as_str()
