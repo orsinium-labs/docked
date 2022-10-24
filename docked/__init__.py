@@ -2,7 +2,7 @@
 from ._stage import Stage
 from ._image import Image
 from ._steps import (
-    Instruction,
+    Step,
     FROM,
     ARG,
     RUN,
@@ -34,7 +34,7 @@ __all__ = [
     'FROM',
     'HEALTHCHECK',
     'Image',
-    'Instruction',
+    'Step',
     'LABEL',
     'ONBUILD',
     'RUN',

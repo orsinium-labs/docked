@@ -24,7 +24,7 @@ def json_if_spaces(vals: list[str]) -> str:
     return ' '.join(vals)
 
 
-class Instruction:
+class Step:
     __slots__ = ()
 
     def as_str(self) -> str:
@@ -41,7 +41,7 @@ class Instruction:
         return f'{type(self).__name__}(...)'
 
 
-class FROM(Instruction):
+class FROM(Step):
     """Initializes a new build stage and sets the Base Image for subsequent instructions.
 
     https://docs.docker.com/engine/reference/builder/#from
@@ -79,7 +79,7 @@ class FROM(Instruction):
         return result
 
 
-class ARG(Instruction):
+class ARG(Step):
     """
     Define a variable that users can pass at build-time to the builder with the `docker build`.
 
@@ -101,7 +101,7 @@ class ARG(Instruction):
         return result
 
 
-class RUN(Instruction):
+class RUN(Step):
     """Execute any commands in a new layer on top of the current image and commit the results.
 
     https://docs.docker.com/engine/reference/builder/#run
@@ -149,7 +149,7 @@ class RUN(Instruction):
         return '1.0'
 
 
-class CMD(Instruction):
+class CMD(Step):
     """Provide defaults for an executing container.
 
     https://docs.docker.com/engine/reference/builder/#cmd
@@ -163,7 +163,7 @@ class CMD(Instruction):
         return f'CMD {_maybe_list(self.cmd)}'
 
 
-class LABEL(Instruction):
+class LABEL(Step):
     """Add metadata to an image
 
     https://docs.docker.com/engine/reference/builder/#label
@@ -183,7 +183,7 @@ class LABEL(Instruction):
         return result
 
 
-class EXPOSE(Instruction):
+class EXPOSE(Step):
     """Inform Docker that the container listens on the specified network ports at runtime.
 
     The EXPOSE instruction does not actually publish the port.
@@ -202,7 +202,7 @@ class EXPOSE(Instruction):
         return f'EXPOSE {self.port}/{self.protocol}'
 
 
-class ENV(Instruction):
+class ENV(Step):
     """Set an environment variable.
 
     The environment variables set using ENV will persist when a container
@@ -225,7 +225,7 @@ class ENV(Instruction):
         return result
 
 
-class ADD(Instruction):
+class ADD(Step):
     """
     Copies new files, directories or remote file URLs from src and adds them
     to the filesystem of the image at the path dst.
@@ -286,7 +286,7 @@ class ADD(Instruction):
         return '1.0'
 
 
-class COPY(Instruction):
+class COPY(Step):
     """
     Copies new files or directories from src and adds them to the filesystem
     of the container at the path dst.
@@ -352,7 +352,7 @@ class COPY(Instruction):
         return '1.0'
 
 
-class ENTRYPOINT(Instruction):
+class ENTRYPOINT(Step):
     """Configure a container that will run as an executable.
 
     https://docs.docker.com/engine/reference/builder/#entrypoint
@@ -366,7 +366,7 @@ class ENTRYPOINT(Instruction):
         return f'ENTRYPOINT {_maybe_list(self.cmd)}'
 
 
-class VOLUME(Instruction):
+class VOLUME(Step):
     """
     Create a mount point with the specified name and mark it as holding
     externally mounted volumes from native host or other containers.
@@ -384,7 +384,7 @@ class VOLUME(Instruction):
         return f'{result} {json_if_spaces(parts)}'
 
 
-class USER(Instruction):
+class USER(Step):
     """Set the user name to use as the default user for the remainder of the stage.
 
     https://docs.docker.com/engine/reference/builder/#user
@@ -402,7 +402,7 @@ class USER(Instruction):
         return result
 
 
-class WORKDIR(Instruction):
+class WORKDIR(Step):
     """
     Set the working directory for any RUN, CMD, ENTRYPOINT, COPY and ADD instructions that follow.
 
@@ -419,7 +419,7 @@ class WORKDIR(Instruction):
         return f'WORKDIR {self.path}'
 
 
-class ONBUILD(Instruction):
+class ONBUILD(Step):
     """
     Add to the image a trigger instruction to be executed at a later time,
     when the image is used as the base for another build.
@@ -428,7 +428,7 @@ class ONBUILD(Instruction):
     """
     __slots__ = ('trigger',)
 
-    def __init__(self, trigger: Instruction) -> None:
+    def __init__(self, trigger: Step) -> None:
         if isinstance(trigger, ONBUILD):
             raise ValueError('cannot use ONBUILD inside ONBUILD')
         self.trigger = trigger
@@ -437,7 +437,7 @@ class ONBUILD(Instruction):
         return f'ONBUILD {self.trigger.as_str()}'
 
 
-class STOPSIGNAL(Instruction):
+class STOPSIGNAL(Step):
     """Sets the system call signal that will be sent to the container to exit.
 
     https://docs.docker.com/engine/reference/builder/#stopsignal
@@ -451,7 +451,7 @@ class STOPSIGNAL(Instruction):
         return f'STOPSIGNAL {self.signal}'
 
 
-class HEALTHCHECK(Instruction):
+class HEALTHCHECK(Step):
     """Check container health by running a command inside the container.
 
     https://docs.docker.com/engine/reference/builder/#healthcheck
@@ -496,7 +496,7 @@ class HEALTHCHECK(Instruction):
         return f'{td.seconds}s'
 
 
-class SHELL(Instruction):
+class SHELL(Step):
     """Override the default shell used for the shell form of commands.
 
     It affects shell form commands inside of RUN, CMD, and ENTRYPOINT instructions.

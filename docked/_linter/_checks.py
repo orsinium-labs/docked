@@ -47,7 +47,7 @@ class Context:
 
 
 @singledispatch
-def check_step(step: steps.Instruction, ctx: Context) -> Iterator[Violation]:
+def check_step(step: steps.Step, ctx: Context) -> Iterator[Violation]:
     yield from ()
 
 

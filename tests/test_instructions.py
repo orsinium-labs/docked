@@ -122,6 +122,6 @@ import docked as d
     # ---
     (d.SHELL(['bash', '-c']), 'SHELL ["bash", "-c"]')
 ])
-def test_as_str(given: d.Instruction, expected: str) -> None:
+def test_as_str(given: d.Step, expected: str) -> None:
     assert given.as_str() == expected
     assert str(given) == expected

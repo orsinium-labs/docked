@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from ._steps import ARG, FROM, Instruction
+from ._steps import ARG, FROM, Step
 
 
 class Stage:
     __slots__ = ('steps', )
-    steps: tuple[Instruction, ...]
+    steps: tuple[Step, ...]
 
-    def __init__(self, first: FROM | ARG, *rest: Instruction) -> None:
+    def __init__(self, first: FROM | ARG, *rest: Step) -> None:
         self.steps = (first, ) + rest
 
     def as_str(self) -> str:
