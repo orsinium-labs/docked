@@ -57,6 +57,8 @@ import docked as d
         d.CLONE('https://github.com/moby/buildkit.git#v0.10.1', '/buildkit', keep_git_dir=True),
         'ADD --keep-git-dir=true https://github.com/moby/buildkit.git#v0.10.1 /buildkit',
     ),
+    (d.EXTRACT('a/b/c.gz', '/'), 'ADD a/b/c.gz /'),
+    (d.EXTRACT('a/b/c.gz', '/', chown='gram'), 'ADD --chown=gram a/b/c.gz /'),
 
     # ---
     (d.COPY('hom*', '/mydir/'), 'COPY hom* /mydir/'),

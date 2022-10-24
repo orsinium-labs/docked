@@ -281,7 +281,7 @@ class DOWNLOAD(_BaseAdd):
 class CLONE(_BaseAdd):
     """Clone a git repository.
 
-    https://docs.docker.com/engine/reference/builder/#add
+    https://docs.docker.com/engine/reference/builder/#adding-a-git-repository-add-git-ref-dir
     """
     keep_git_dir: bool = False
 
@@ -298,6 +298,8 @@ class CLONE(_BaseAdd):
 
 class EXTRACT(_BaseAdd):
     """Extract an archive from the host machine into the image.
+
+    Supported formats: identity, gzip, bzip2, and xz.
 
     https://docs.docker.com/engine/reference/builder/#add
     """

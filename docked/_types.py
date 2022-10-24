@@ -6,9 +6,14 @@ if TYPE_CHECKING:
 
 
 class Checksum:
+    """Hash of remote content for DOWNLOAD.
+    """
+    __slots__ = ('hex', 'algorithm')
+
     def __init__(
         self,
         hex: str,
+        *,
         algorithm: Literal['sha256', 'sha384', 'sha512', 'blake3'] = 'sha256',
     ) -> None:
         self.hex = hex
