@@ -1,8 +1,10 @@
 from __future__ import annotations
+from dataclasses import dataclass
 
 import json
 from pathlib import PosixPath
 from typing import TYPE_CHECKING
+from ._types import Checksum
 
 if TYPE_CHECKING:
     from datetime import timedelta
@@ -225,45 +227,17 @@ class ENV(Step):
         return result
 
 
-class ADD(Step):
-    """
-    Copies new files, directories or remote file URLs from src and adds them
-    to the filesystem of the image at the path dst.
-
-    ADD is old, does too many things, and can suprise you by unpacking archives.
-    If possible, use COPY instead. Or wget if you need to download remote files.
-
-    https://docs.docker.com/engine/reference/builder/#add
-    """
-    __slots__ = ('src', 'dst', 'chown', 'checksum', 'keep_git_dir', 'link', 'checksum_algoritm')
-
-    def __init__(
-        self,
-        src: str | PosixPath | list[str | PosixPath],
-        dst: str | PosixPath,
-        *,
-        chown: str | int | None = None,
-        checksum_algoritm: Literal['sha256', 'sha384', 'sha512', 'blake3'] = 'sha256',
-        checksum: str | None = None,
-        keep_git_dir: bool = False,
-        link: bool = False,
-    ) -> None:
-        self.src = src
-        self.dst = dst
-        self.chown = chown
-        self.checksum = checksum
-        self.keep_git_dir = keep_git_dir
-        self.checksum_algoritm = checksum_algoritm
-        self.link = link
+@dataclass(repr=False)
+class _BaseAdd(Step):
+    src: str | PosixPath | list[str | PosixPath]
+    dst: str | PosixPath
+    chown: str | int | None = None
+    link: bool = False
 
     def as_str(self) -> str:
-        result = 'ADD'
+        result = ''
         if self.chown:
             result += f' --chown={self.chown}'
-        if self.checksum:
-            result += f' --checksum={self.checksum_algoritm}:{self.checksum}'
-        if self.keep_git_dir:
-            result += ' --keep-git-dir=true'
         if self.link:
             result += ' --link'
         parts = self._sources + [str(self.dst)]
@@ -277,62 +251,77 @@ class ADD(Step):
 
     @property
     def min_version(self) -> str:
-        if self.checksum or self.keep_git_dir:
-            return 'labs'
-        if isinstance(self.src, str) and self.src.startswith('git@'):
-            return 'labs'
         if self.link:
             return '1.4'
         return '1.0'
 
 
-class COPY(Step):
+@dataclass
+class DOWNLOAD(_BaseAdd):
+    """Download a remote file.
+
+    https://docs.docker.com/engine/reference/builder/#add
+    """
+    checksum: Checksum | None = None
+
+    def as_str(self) -> str:
+        result = 'ADD'
+        if self.checksum:
+            result += f' --checksum={self.checksum}'
+        return f'{result}{super().as_str()}'
+
+    @property
+    def min_version(self) -> str:
+        if self.checksum:
+            return 'labs'
+        return super().min_version
+
+
+@dataclass
+class CLONE(_BaseAdd):
+    """Clone a git repository.
+
+    https://docs.docker.com/engine/reference/builder/#add
+    """
+    keep_git_dir: bool = False
+
+    def as_str(self) -> str:
+        result = 'ADD'
+        if self.keep_git_dir:
+            result += ' --keep-git-dir=true'
+        return f'{result}{super().as_str()}'
+
+    @property
+    def min_version(self) -> str:
+        return 'labs'
+
+
+class EXTRACT(_BaseAdd):
+    """Extract an archive from the host machine into the image.
+
+    https://docs.docker.com/engine/reference/builder/#add
+    """
+
+    def as_str(self) -> str:
+        return f'ADD{super().as_str()}'
+
+
+@dataclass
+class COPY(_BaseAdd):
     """
     Copies new files or directories from src and adds them to the filesystem
-    of the container at the path dst.
-
-    The difference with ADD is that COPY:
-
-    1. Can't download files from URL or git.
-    2. Doesn't unpack archives.
-    3. Can copy files from previous stages.
+    of the image at the path dst.
 
     https://docs.docker.com/engine/reference/builder/#copy
     """
-    __slots__ = ('src', 'dst', 'chown', 'link', 'from_stage')
-
-    def __init__(
-        self,
-        src: str | PosixPath | list[str | PosixPath],
-        dst: str | PosixPath,
-        *,
-        from_stage: Stage | str | None = None,
-        chown: str | int | None = None,
-        link: bool = False,
-    ) -> None:
-        self.src = src
-        self.dst = dst
-        self.from_stage = from_stage
-        self.chown = chown
-        self.link = link
+    from_stage: Stage | str | None = None
 
     def as_str(self) -> str:
         result = 'COPY'
-        if self.chown:
-            result += f' --chown={self.chown}'
-        if self.link:
-            result += ' --link'
         from_name = self._from_name
         if from_name:
             result += f' --from={from_name}'
-        parts = self._sources + [str(self.dst)]
-        return f'{result} {json_if_spaces(parts)}'
-
-    @property
-    def _sources(self) -> list[str]:
-        if isinstance(self.src, list):
-            return [str(s) for s in self.src]
-        return [str(self.src)]
+        return f'{result}{super().as_str()}'
 
     @property
     def _from_name(self) -> str | None:
@@ -344,12 +333,6 @@ class COPY(Step):
         if name is None:
             raise ValueError('the stage must have a name to copy from it')
         return name
-
-    @property
-    def min_version(self) -> str:
-        if self.link:
-            return '1.4'
-        return '1.0'
 
 
 class ENTRYPOINT(Step):

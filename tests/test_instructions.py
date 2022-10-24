@@ -44,23 +44,17 @@ import docked as d
     (d.ENV('user', 'gram orsinium'), 'ENV user="gram orsinium"'),
 
     # ---
-    (d.ADD('hom*', '/mydir/'), 'ADD hom* /mydir/'),
-    (d.ADD('test.txt', 'relativeDir/'), 'ADD test.txt relativeDir/'),
-    (d.ADD('test.txt', PosixPath('hello', 'world')), 'ADD test.txt hello/world'),
-    (d.ADD('win path', '/'), 'ADD ["win path", "/"]'),
-    (d.ADD(['src1', 'src2'], '/'), 'ADD src1 src2 /'),
-    (d.ADD('src', 'win path'), 'ADD ["src", "win path"]'),
-    (d.ADD('files', '/somedir/', chown='gram'), 'ADD --chown=gram files /somedir/'),
-    (d.ADD('files', '/somedir/', chown='gram:docker'), 'ADD --chown=gram:docker files /somedir/'),
-    (d.ADD('files', '/somedir/', chown=1), 'ADD --chown=1 files /somedir/'),
-    (d.ADD('files/', '/', link=True), 'ADD --link files/ /'),
-    (d.ADD('https://a.b/c.gz', '/', checksum='244'), 'ADD --checksum=sha256:244 https://a.b/c.gz /'),
     (
-        d.ADD('https://a.b/c.gz', '/', checksum='244', checksum_algoritm='sha512'),
+        d.DOWNLOAD(
+            'https://a.b/c.gz', '/',
+            checksum=d.Checksum('244'),
+        ), 'ADD --checksum=sha256:244 https://a.b/c.gz /'),
+    (
+        d.DOWNLOAD('https://a.b/c.gz', '/', checksum=d.Checksum('244', algorithm='sha512')),
         'ADD --checksum=sha512:244 https://a.b/c.gz /',
     ),
     (
-        d.ADD('https://github.com/moby/buildkit.git#v0.10.1', '/buildkit', keep_git_dir=True),
+        d.CLONE('https://github.com/moby/buildkit.git#v0.10.1', '/buildkit', keep_git_dir=True),
         'ADD --keep-git-dir=true https://github.com/moby/buildkit.git#v0.10.1 /buildkit',
     ),
 
@@ -101,7 +95,7 @@ import docked as d
     (d.WORKDIR('win path'), 'WORKDIR win path'),  # is that right?
 
     # ---
-    (d.ONBUILD(d.ADD('.', '/app/src')), 'ONBUILD ADD . /app/src'),
+    (d.ONBUILD(d.COPY('.', '/app/src')), 'ONBUILD COPY . /app/src'),
     (d.ONBUILD(d.RUN('echo hello')), 'ONBUILD RUN echo hello'),
 
     # ---
