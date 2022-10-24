@@ -18,4 +18,4 @@ class Violation:
         return replace(self, summary=self.summary.format(**kwargs))
 
     def __str__(self) -> str:
-        return f'{self.severity_text[0]}{self.code:03}: {self.summary}'
+        return f'{self.severity_text[0]}{self.code:04}: {self.summary}'

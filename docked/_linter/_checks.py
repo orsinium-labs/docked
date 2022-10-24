@@ -56,6 +56,13 @@ def _(step: steps.FROM, ctx: Context) -> Iterator[Violation]:
     before = set(ctx.steps[:ctx.index]) - {'ARG'}
     for step_name in before:
         yield vs.FROM_01.format(step=step_name)
+    if not step.image:
+        yield vs.FROM_04
+    if step.image != 'scratch' and not step.digest:
+        if not step.tag:
+            yield vs.FROM_02
+        if step.tag == 'latest':
+            yield vs.FROM_03
 
 
 @check_step.register
