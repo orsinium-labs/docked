@@ -4,7 +4,8 @@ import subprocess
 import sys
 from tempfile import NamedTemporaryFile
 
-from typing import TYPE_CHECKING, Iterator, TextIO, overload
+from typing import TYPE_CHECKING, Container, Iterator, TextIO, overload
+from ._linter import lint
 
 if TYPE_CHECKING:
     from ._stage import Stage
@@ -110,6 +111,24 @@ class Image:
         if exit_on_failure and result.returncode != 0:
             sys.exit(result.returncode)
         return result.returncode
+
+    def lint(
+        self,
+        disable_codes: Container[int] = (),
+        stdout: TextIO = sys.stdout,
+        exit_on_failure: bool = True,
+    ) -> int:
+        """Run linter on the image.
+        """
+        count = 0
+        for v in lint(self):
+            if v.code in disable_codes:
+                continue
+            print(v, file=stdout)
+            count += 1
+        if exit_on_failure:
+            sys.exit(min(count, 100))
+        return count
 
     def __str__(self) -> str:
         return self.as_str()

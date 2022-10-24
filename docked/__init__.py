@@ -22,6 +22,7 @@ from ._instructions import (
     SHELL,
 )
 
+__version__ = '0.1.0'
 __all__ = [
     'ADD',
     'ARG',
