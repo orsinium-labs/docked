@@ -1,7 +1,7 @@
 
 from ._stage import Stage
 from ._image import Image
-from ._instructions import (
+from ._steps import (
     Instruction,
     FROM,
     ARG,

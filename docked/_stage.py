@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ._instructions import ARG, FROM, Instruction
+from ._steps import ARG, FROM, Instruction
 
 
 class Stage:

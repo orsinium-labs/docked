@@ -11,7 +11,7 @@ from functools import singledispatch
 from typing import Iterator
 from ._violation import Violation
 from . import _violations as vs
-from .. import _instructions as steps
+from .. import _steps as steps
 
 
 BAD_COMMANDS = frozenset({
