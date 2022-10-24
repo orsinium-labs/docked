@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import json
 from pathlib import PosixPath
 from typing import TYPE_CHECKING
-from ._types import Checksum
+from ._fromatters import format_stage_name
 
 if TYPE_CHECKING:
     from datetime import timedelta
@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from typing import Literal
 
     from ._stage import Stage
+    from ._types import Checksum, Mount
 
 
 def _maybe_list(val: str | list[str]) -> str:
@@ -114,7 +115,7 @@ class RUN(Step):
         self,
         first: str | list[str],
         *rest: str,
-        mount: Literal['bind', 'cache', 'tmpfs', 'secret', 'ssh'] = 'bind',
+        mount: Mount | None = None,
         network: Literal['default', 'none', 'host'] = 'default',
         security: Literal['insecure', 'sandbox'] = 'sandbox',
     ) -> None:
@@ -128,7 +129,7 @@ class RUN(Step):
 
     def as_str(self) -> str:
         result = 'RUN'
-        if self.mount != 'bind':
+        if self.mount is not None:
             result += f' --mount={self.mount}'
         if self.network != 'default':
             result += f' --network={self.network}'
@@ -320,21 +321,9 @@ class COPY(_BaseAdd):
 
     def as_str(self) -> str:
         result = 'COPY'
-        from_name = self._from_name
-        if from_name:
-            result += f' --from={from_name}'
+        if self.from_stage:
+            result += f' --from={format_stage_name(self.from_stage)}'
         return f'{result}{super().as_str()}'
-
-    @property
-    def _from_name(self) -> str | None:
-        if self.from_stage is None:
-            return None
-        if isinstance(self.from_stage, str):
-            return self.from_stage
-        name = self.from_stage.name
-        if name is None:
-            raise ValueError('the stage must have a name to copy from it')
-        return name
 
 
 class ENTRYPOINT(Step):

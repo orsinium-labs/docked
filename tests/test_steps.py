@@ -22,7 +22,7 @@ import docked as d
     (d.RUN('apt-get update'), 'RUN apt-get update'),
     (d.RUN('echo 1', 'echo 2'), 'RUN echo 1 && \\\n    echo 2'),
     (d.RUN(['apt-get', 'update']), 'RUN ["apt-get", "update"]'),
-    (d.RUN('echo 1', mount='cache'), 'RUN --mount=cache echo 1'),
+    (d.RUN('echo 1', mount=d.SecretMount()), 'RUN --mount=type=secret echo 1'),
     (d.RUN('echo 1', network='none'), 'RUN --network=none echo 1'),
     (d.RUN('echo 1', security='insecure'), 'RUN --security=insecure echo 1'),
 
