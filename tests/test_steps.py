@@ -21,13 +21,16 @@ import docked as d
     # ---
     (d.RUN('apt-get update'), 'RUN apt-get update'),
     (d.RUN('echo 1', 'echo 2'), 'RUN echo 1 && \\\n    echo 2'),
-    (d.RUN(['apt-get', 'update']), 'RUN ["apt-get", "update"]'),
+    (d.RUN('apt-get update', shell=False), 'RUN ["apt-get", "update"]'),
+    (d.RUN(['apt-get', 'update']), 'RUN apt-get update'),
     (d.RUN('echo 1', mount=d.SecretMount()), 'RUN --mount=type=secret echo 1'),
     (d.RUN('echo 1', network='none'), 'RUN --network=none echo 1'),
     (d.RUN('echo 1', security='insecure'), 'RUN --security=insecure echo 1'),
 
     # ---
-    (d.CMD('echo 1'), 'CMD echo 1'),
+    (d.CMD('echo 1', shell=True), 'CMD echo 1'),
+    (d.CMD(['echo', '1'], shell=True), 'CMD echo 1'),
+    (d.CMD('echo 1'), 'CMD ["echo", "1"]'),
     (d.CMD(['echo', '1']), 'CMD ["echo", "1"]'),
 
     # ---
@@ -74,11 +77,14 @@ import docked as d
     (d.COPY('files/', '/', from_stage='build'), 'COPY --from=build files/ /'),
 
     # ---
-    (d.ENTRYPOINT('nginx'), 'ENTRYPOINT nginx'),
-    (d.ENTRYPOINT('cowsay hello'), 'ENTRYPOINT cowsay hello'),
+    (d.ENTRYPOINT('nginx'), 'ENTRYPOINT ["nginx"]'),
+    (d.ENTRYPOINT('cowsay hello'), 'ENTRYPOINT ["cowsay", "hello"]'),
     (d.ENTRYPOINT(['nginx']), 'ENTRYPOINT ["nginx"]'),
     (d.ENTRYPOINT(['cowsay', 'hello']), 'ENTRYPOINT ["cowsay", "hello"]'),
     (d.ENTRYPOINT(['top', '-b']), 'ENTRYPOINT ["top", "-b"]'),
+    (d.ENTRYPOINT(['nginx'], shell=True), 'ENTRYPOINT nginx'),
+    (d.ENTRYPOINT(['cowsay', 'hello'], shell=True), 'ENTRYPOINT cowsay hello'),
+    (d.ENTRYPOINT(['top', '-b'], shell=True), 'ENTRYPOINT top -b'),
 
     # ---
     (d.VOLUME('/myvol'), 'VOLUME /myvol'),
@@ -107,16 +113,18 @@ import docked as d
 
     # ---
     (d.HEALTHCHECK(None), 'HEALTHCHECK NONE'),
-    (d.HEALTHCHECK('curl -f localhost'), 'HEALTHCHECK CMD curl -f localhost'),
-    (d.HEALTHCHECK('echo 1', interval='5m'), 'HEALTHCHECK --interval=5m CMD echo 1'),
-    (d.HEALTHCHECK('echo 1', interval=timedelta(seconds=34)), 'HEALTHCHECK --interval=34s CMD echo 1'),
-    (d.HEALTHCHECK('echo 1', timeout='5m'), 'HEALTHCHECK --timeout=5m CMD echo 1'),
-    (d.HEALTHCHECK('echo 1', timeout=timedelta(seconds=34)), 'HEALTHCHECK --timeout=34s CMD echo 1'),
-    (d.HEALTHCHECK('echo 1', start_period='5m'), 'HEALTHCHECK --start-period=5m CMD echo 1'),
-    (d.HEALTHCHECK('echo 1', retries=9), 'HEALTHCHECK --retries=9 CMD echo 1'),
+    (d.HEALTHCHECK('curl -f localhost'), 'HEALTHCHECK CMD ["curl", "-f", "localhost"]'),
+    (d.HEALTHCHECK('curl -f localhost', shell=True), 'HEALTHCHECK CMD curl -f localhost'),
+    (d.HEALTHCHECK('echo 1', interval='5m'), 'HEALTHCHECK --interval=5m CMD ["echo", "1"]'),
+    (d.HEALTHCHECK('echo 1', interval=timedelta(seconds=34)), 'HEALTHCHECK --interval=34s CMD ["echo", "1"]'),
+    (d.HEALTHCHECK('echo 1', timeout='5m'), 'HEALTHCHECK --timeout=5m CMD ["echo", "1"]'),
+    (d.HEALTHCHECK('echo 1', timeout=timedelta(seconds=34)), 'HEALTHCHECK --timeout=34s CMD ["echo", "1"]'),
+    (d.HEALTHCHECK('echo 1', start_period='5m'), 'HEALTHCHECK --start-period=5m CMD ["echo", "1"]'),
+    (d.HEALTHCHECK('echo 1', retries=9), 'HEALTHCHECK --retries=9 CMD ["echo", "1"]'),
 
     # ---
-    (d.SHELL(['bash', '-c']), 'SHELL ["bash", "-c"]')
+    (d.SHELL(['bash', '-c']), 'SHELL ["bash", "-c"]'),
+    (d.SHELL('bash -c'), 'SHELL ["bash", "-c"]'),
 ])
 def test_as_str(given: d.Step, expected: str) -> None:
     assert given.as_str() == expected

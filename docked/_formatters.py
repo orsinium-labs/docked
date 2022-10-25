@@ -1,4 +1,6 @@
 from __future__ import annotations
+import json
+import shlex
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -12,3 +14,21 @@ def format_stage_name(stage: Stage | str) -> str:
     if name is None:
         raise ValueError('the stage must have a name to copy from it')
     return name
+
+
+def format_shell_cmd(cmd: list[str] | str, *, shell: bool) -> str:
+    """
+
+    + `shell` form is when cmd is a string that gets passed into shell.
+    + `exec` form is when cmd is a list that gets executed on its own.
+    """
+    # shell form
+    if shell:
+        if isinstance(cmd, str):
+            return cmd
+        return shlex.join(cmd)
+
+    # exec form
+    if isinstance(cmd, str):
+        cmd = shlex.split(cmd)
+    return json.dumps(cmd)

@@ -4,7 +4,7 @@ from pathlib import PosixPath
 
 from typing import TYPE_CHECKING
 
-from ._fromatters import format_stage_name
+from ._formatters import format_stage_name
 
 
 if TYPE_CHECKING:

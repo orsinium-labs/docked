@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import json
 from pathlib import PosixPath
 from typing import TYPE_CHECKING
-from ._fromatters import format_stage_name
+from ._formatters import format_stage_name, format_shell_cmd
 
 if TYPE_CHECKING:
     from datetime import timedelta
@@ -13,12 +13,6 @@ if TYPE_CHECKING:
 
     from ._stage import Stage
     from ._types import Checksum, Mount
-
-
-def _maybe_list(val: str | list[str]) -> str:
-    if isinstance(val, str):
-        return val
-    return json.dumps(val)
 
 
 def json_if_spaces(vals: list[str]) -> str:
@@ -109,7 +103,7 @@ class RUN(Step):
 
     https://docs.docker.com/engine/reference/builder/#run
     """
-    __slots__ = ('first', 'rest', 'mount', 'network', 'security')
+    __slots__ = ('first', 'rest', 'mount', 'network', 'security', 'shell')
 
     def __init__(
         self,
@@ -118,14 +112,16 @@ class RUN(Step):
         mount: Mount | None = None,
         network: Literal['default', 'none', 'host'] = 'default',
         security: Literal['insecure', 'sandbox'] = 'sandbox',
+        shell: bool = True,
     ) -> None:
-        if not isinstance(first, str) and rest:
-            raise ValueError('cannot use list ("exec form") with multiple commands')
+        if not shell and rest:
+            raise ValueError('cannot use `shell=False` with multiple commands')
         self.first = first
         self.rest = rest
         self.mount = mount
         self.network = network
         self.security = security
+        self.shell = shell
 
     def as_str(self) -> str:
         result = 'RUN'
@@ -135,10 +131,10 @@ class RUN(Step):
             result += f' --network={self.network}'
         if self.security != 'sandbox':
             result += f' --security={self.security}'
-        if isinstance(self.first, str):
+        if isinstance(self.first, str) and self.rest:
             result += ' ' + ' && \\\n    '.join((self.first,) + self.rest)
         else:
-            result += ' ' + json.dumps(self.first)
+            result += ' ' + format_shell_cmd(self.first, shell=self.shell)
         return result
 
     @property
@@ -157,13 +153,14 @@ class CMD(Step):
 
     https://docs.docker.com/engine/reference/builder/#cmd
     """
-    __slots__ = ('cmd', )
+    __slots__ = ('cmd', 'shell')
 
-    def __init__(self, cmd: str | list[str]) -> None:
+    def __init__(self, cmd: str | list[str], shell: bool = False) -> None:
         self.cmd = cmd
+        self.shell = shell
 
     def as_str(self) -> str:
-        return f'CMD {_maybe_list(self.cmd)}'
+        return f'CMD {format_shell_cmd(self.cmd, shell=self.shell)}'
 
 
 class LABEL(Step):
@@ -331,13 +328,14 @@ class ENTRYPOINT(Step):
 
     https://docs.docker.com/engine/reference/builder/#entrypoint
     """
-    __slots__ = ('cmd',)
+    __slots__ = ('cmd', 'shell')
 
-    def __init__(self, cmd: str | list[str]) -> None:
+    def __init__(self, cmd: str | list[str], shell: bool = False) -> None:
         self.cmd = cmd
+        self.shell = shell
 
     def as_str(self) -> str:
-        return f'ENTRYPOINT {_maybe_list(self.cmd)}'
+        return f'ENTRYPOINT {format_shell_cmd(self.cmd, shell=self.shell)}'
 
 
 class VOLUME(Step):
@@ -430,7 +428,7 @@ class HEALTHCHECK(Step):
 
     https://docs.docker.com/engine/reference/builder/#healthcheck
     """
-    __slots__ = ('cmd', 'interval', 'timeout', 'start_period', 'retries')
+    __slots__ = ('cmd', 'interval', 'timeout', 'start_period', 'retries', 'shell')
 
     def __init__(
         self,
@@ -440,12 +438,14 @@ class HEALTHCHECK(Step):
         timeout: timedelta | str = '30s',
         start_period: timedelta | str = '0s',
         retries: int = 3,
+        shell: bool = False,
     ) -> None:
         self.cmd = cmd
         self.interval = interval
         self.timeout = timeout
         self.start_period = start_period
         self.retries = retries
+        self.shell = shell
 
     def as_str(self) -> str:
         result = 'HEALTHCHECK'
@@ -460,7 +460,7 @@ class HEALTHCHECK(Step):
         if self.cmd is None:
             result += ' NONE'
         else:
-            result += f' CMD {_maybe_list(self.cmd)}'
+            result += f' CMD {format_shell_cmd(self.cmd, shell=self.shell)}'
         return result
 
     @staticmethod
@@ -479,8 +479,8 @@ class SHELL(Step):
     """
     __slots__ = ('cmd', )
 
-    def __init__(self, cmd: list[str]) -> None:
+    def __init__(self, cmd: str | list[str]) -> None:
         self.cmd = cmd
 
     def as_str(self) -> str:
-        return f'SHELL {json.dumps(self.cmd)}'
+        return f'SHELL {format_shell_cmd(self.cmd, shell=False)}'
