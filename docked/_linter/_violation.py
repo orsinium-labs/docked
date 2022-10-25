@@ -6,9 +6,17 @@ import logging
 
 @dataclass(frozen=True)
 class Violation:
+    """
+
+    Severity:
+        ERROR:      never do that.
+        WARNING:    don't do that unless you're 100% sure.
+        INFO:       it's strange you do that but ok, just checking.
+    """
     code: int
     severity: int
     summary: str
+    url: str | None = None
 
     @property
     def severity_text(self) -> str:

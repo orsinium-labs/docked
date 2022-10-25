@@ -8,6 +8,7 @@ Ideas for checks come from these linters:
 from __future__ import annotations
 from dataclasses import dataclass
 from functools import singledispatch
+import shlex
 from typing import Iterator
 from ._violation import Violation
 from . import _violations as vs
@@ -56,8 +57,6 @@ def _(step: steps.FROM, ctx: Context) -> Iterator[Violation]:
     before = set(ctx.steps[:ctx.index]) - {'ARG'}
     for step_name in before:
         yield vs.FROM_01.format(step=step_name)
-    if not step.image:
-        yield vs.FROM_04
     if step.image != 'scratch' and not step.digest:
         if not step.tag:
             yield vs.FROM_02
@@ -70,18 +69,21 @@ def _(step: steps.WORKDIR, ctx: Context) -> Iterator[Violation]:
     if str(step.path).startswith('/'):
         return
     # TODO: support windows paths
-    yield vs.V3000
+    yield vs.WORKDIR_01
 
 
 @check_step.register
 def _(step: steps.RUN, ctx: Context) -> Iterator[Violation]:
     for cmd in (step.first,) + step.rest:
-        if isinstance(cmd, list):
-            bin = cmd[0]
-        else:
-            bin = cmd.split()[0]
+        if not isinstance(cmd, list):
+            cmd = shlex.split(cmd)
+        bin = cmd[0]
+        if bin == 'sudo':
+            yield vs.RUN_02
+            if len(cmd) > 1:
+                bin = cmd[1]
         if bin in BAD_COMMANDS:
-            yield vs.V3001.format(bin=bin)
+            yield vs.RUN_01.format(bin=bin)
 
 
 @check_step.register

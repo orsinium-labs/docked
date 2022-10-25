@@ -2,6 +2,8 @@
 from logging import ERROR, INFO, WARNING
 from ._violation import Violation
 
+DOCKER_GUIDE = 'https://docs.docker.com/develop/develop-images/dockerfile_best-practices/'
+
 FROM_01 = Violation(
     code=101,
     severity=ERROR,
@@ -17,24 +19,30 @@ FROM_03 = Violation(
     severity=WARNING,
     summary='Base image tag should not be `latest`',
 )
-FROM_04 = Violation(
-    code=104,
-    severity=ERROR,
-    summary='Base image name must not be empty',
+
+WORKDIR_01 = Violation(
+    code=201,
+    severity=WARNING,
+    summary='WORKDIR path should be absolute',
+    url=f'{DOCKER_GUIDE}#workdir'
 )
 
-V3000 = Violation(
-    code=3000,
-    severity=ERROR,
-    summary='Use absolute WORKDIR',
-)
-V3001 = Violation(
-    code=3001,
+
+RUN_01 = Violation(
+    code=301,
     severity=INFO,
-    summary='Do not RUN {bin} in Docker',
+    summary='Do not RUN {bin}',
 )
+RUN_02 = Violation(
+    code=302,
+    severity=WARNING,
+    summary='Do not use sudo',
+    url=f'{DOCKER_GUIDE}#user',
+)
+
 V3002 = Violation(
     code=3002,
     severity=WARNING,
     summary='Last USER should not be root',
+    url=f'{DOCKER_GUIDE}#user'
 )
