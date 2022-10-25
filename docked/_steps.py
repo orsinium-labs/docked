@@ -54,6 +54,7 @@ class FROM(Step):
         platform: str | None = None,
         name: str | None = None,
     ) -> None:
+        assert image
         if tag and digest:
             raise ValueError('cannot set both tag and digest')
         self.image = image
@@ -88,6 +89,7 @@ class ARG(Step):
     __slots__ = ('name', 'default')
 
     def __init__(self, name: str, default: str | None = None) -> None:
+        assert name
         self.name = name
         self.default = default
 
@@ -114,6 +116,7 @@ class RUN(Step):
         security: Literal['insecure', 'sandbox'] = 'sandbox',
         shell: bool = True,
     ) -> None:
+        assert first
         if not shell and rest:
             raise ValueError('cannot use `shell=False` with multiple commands')
         self.first = first
@@ -171,6 +174,7 @@ class LABEL(Step):
     __slots__ = ('name', 'value')
 
     def __init__(self, name: str, value: str) -> None:
+        assert name
         self.name = name
         self.value = value
 
@@ -213,6 +217,7 @@ class ENV(Step):
     __slots__ = ('key', 'value')
 
     def __init__(self, key: str, value: str) -> None:
+        assert key
         self.key = key
         self.value = value
 
@@ -331,6 +336,7 @@ class ENTRYPOINT(Step):
     __slots__ = ('cmd', 'shell')
 
     def __init__(self, cmd: str | list[str], shell: bool = False) -> None:
+        assert cmd
         self.cmd = cmd
         self.shell = shell
 
@@ -348,6 +354,7 @@ class VOLUME(Step):
     __slots__ = ('paths', )
 
     def __init__(self, *paths: str | PosixPath) -> None:
+        assert paths
         self.paths = paths
 
     def as_str(self) -> str:
@@ -385,6 +392,7 @@ class WORKDIR(Step):
     __slots__ = ('path', )
 
     def __init__(self, path: str | PosixPath) -> None:
+        assert path
         self.path = path
 
     def as_str(self) -> str:
@@ -417,6 +425,7 @@ class STOPSIGNAL(Step):
     __slots__ = ('signal',)
 
     def __init__(self, signal: str | int | Signals) -> None:
+        assert signal
         self.signal = signal
 
     def as_str(self) -> str:
@@ -440,6 +449,7 @@ class HEALTHCHECK(Step):
         retries: int = 3,
         shell: bool = False,
     ) -> None:
+        assert cmd or cmd is None
         self.cmd = cmd
         self.interval = interval
         self.timeout = timeout
@@ -480,6 +490,7 @@ class SHELL(Step):
     __slots__ = ('cmd', )
 
     def __init__(self, cmd: str | list[str]) -> None:
+        assert cmd
         self.cmd = cmd
 
     def as_str(self) -> str:
