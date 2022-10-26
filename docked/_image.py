@@ -65,7 +65,7 @@ class Image:
         yield f'# escape={self.escape}'
         for stage in self.stages:
             yield ''
-            yield stage.as_str()
+            yield from stage.iter_lines()
 
     @overload
     def save(self, path: Path) -> None:

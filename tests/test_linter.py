@@ -40,7 +40,7 @@ import docked as d
 
 ])
 def test_linter(given: list, expected: str) -> None:
-    image = d.Image(d.Stage(*given))
+    image = d.Image(d.Stage(build=given))
     stdout = StringIO()
     code = image.lint(exit_on_failure=False, stdout=stdout)
     assert code == 1

@@ -11,9 +11,9 @@ if TYPE_CHECKING:
 def lint(image: Image) -> Iterator[Violation]:
     for stage in image.stages:
         ctx = Context(
-            steps=tuple(type(step).__name__ for step in stage.steps),
+            steps=tuple(type(step).__name__ for step in stage.all_steps),
             index=0,
         )
-        for i, step in enumerate(stage.steps):
+        for i, step in enumerate(stage.all_steps):
             ctx.index = i
             yield from check_step(step, ctx)

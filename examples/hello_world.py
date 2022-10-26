@@ -14,8 +14,12 @@ Directly build and run Docker image without saving a file:
 import docked as d
 
 stage = d.Stage(
-    d.FROM('busybox', tag='latest'),
-    d.CMD(['echo', 'hello world!'])
+    build=[
+        d.FROM('busybox', tag='latest'),
+    ],
+    run=[
+        d.CMD(['echo', 'hello world!']),
+    ],
 )
 image = d.Image(stage)
 
