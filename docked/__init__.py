@@ -32,6 +32,7 @@ __all__ = [
     'Image',
     'Mount',
     'SecretMount',
+    'SSHMount',
     'Stage',
     'Step',
 
@@ -51,7 +52,6 @@ __all__ = [
     'ONBUILD',
     'RUN',
     'SHELL',
-    'SSHMount',
     'STOPSIGNAL',
     'USER',
     'VOLUME',

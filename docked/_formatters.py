@@ -32,3 +32,9 @@ def format_shell_cmd(cmd: list[str] | str, *, shell: bool) -> str:
     if isinstance(cmd, str):
         cmd = shlex.split(cmd)
     return json.dumps(cmd)
+
+
+def json_if_spaces(vals: list[str]) -> str:
+    if any(' ' in val for val in vals):
+        return json.dumps(vals)
+    return ' '.join(vals)

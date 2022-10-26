@@ -1,44 +1,19 @@
 from __future__ import annotations
 from dataclasses import dataclass
 
-import json
 from pathlib import PosixPath
 from typing import TYPE_CHECKING
-from ._formatters import format_stage_name, format_shell_cmd
+from .._formatters import format_stage_name, format_shell_cmd, json_if_spaces
+from ._base import BuildStep, Step
 
 if TYPE_CHECKING:
-    from datetime import timedelta
-    from signal import Signals
     from typing import Literal
 
-    from ._stage import Stage
-    from ._types import Checksum, Mount
+    from .._stage import Stage
+    from .._types import Checksum, Mount
 
 
-def json_if_spaces(vals: list[str]) -> str:
-    if any(' ' in val for val in vals):
-        return json.dumps(vals)
-    return ' '.join(vals)
-
-
-class Step:
-    __slots__ = ()
-
-    def as_str(self) -> str:
-        raise NotImplementedError
-
-    @property
-    def min_version(self) -> str:
-        return '1.0'
-
-    def __str__(self) -> str:
-        return self.as_str()
-
-    def __repr__(self) -> str:
-        return f'{type(self).__name__}(...)'
-
-
-class FROM(Step):
+class FROM(BuildStep):
     """Initializes a new build stage and sets the Base Image for subsequent instructions.
 
     https://docs.docker.com/engine/reference/builder/#from
@@ -77,7 +52,7 @@ class FROM(Step):
         return result
 
 
-class ARG(Step):
+class ARG(BuildStep):
     """
     Define a variable that users can pass at build-time to the builder with the `docker build`.
 
@@ -100,7 +75,7 @@ class ARG(Step):
         return result
 
 
-class RUN(Step):
+class RUN(BuildStep):
     """Execute any commands in a new layer on top of the current image and commit the results.
 
     https://docs.docker.com/engine/reference/builder/#run
@@ -151,22 +126,7 @@ class RUN(Step):
         return '1.0'
 
 
-class CMD(Step):
-    """Provide defaults for an executing container.
-
-    https://docs.docker.com/engine/reference/builder/#cmd
-    """
-    __slots__ = ('cmd', 'shell')
-
-    def __init__(self, cmd: str | list[str], shell: bool = False) -> None:
-        self.cmd = cmd
-        self.shell = shell
-
-    def as_str(self) -> str:
-        return f'CMD {format_shell_cmd(self.cmd, shell=self.shell)}'
-
-
-class LABEL(Step):
+class LABEL(BuildStep):
     """Add metadata to an image
 
     https://docs.docker.com/engine/reference/builder/#label
@@ -187,26 +147,7 @@ class LABEL(Step):
         return result
 
 
-class EXPOSE(Step):
-    """Inform Docker that the container listens on the specified network ports at runtime.
-
-    The EXPOSE instruction does not actually publish the port.
-    It functions as a type of documentation between the person who builds the image
-    and the person who runs the container, about which ports are intended to be published.
-
-    https://docs.docker.com/engine/reference/builder/#expose
-    """
-    __slots__ = ('port', 'protocol')
-
-    def __init__(self, port: int, protocol: Literal['tcp', 'udp'] = 'tcp') -> None:
-        self.port = port
-        self.protocol = protocol
-
-    def as_str(self) -> str:
-        return f'EXPOSE {self.port}/{self.protocol}'
-
-
-class ENV(Step):
+class ENV(BuildStep):
     """Set an environment variable.
 
     The environment variables set using ENV will persist when a container
@@ -231,7 +172,7 @@ class ENV(Step):
 
 
 @dataclass(repr=False)
-class _BaseAdd(Step):
+class _BaseAdd(BuildStep):
     src: str | PosixPath | list[str | PosixPath]
     dst: str | PosixPath
     chown: str | int | None = None
@@ -328,42 +269,7 @@ class COPY(_BaseAdd):
         return f'{result}{super().as_str()}'
 
 
-class ENTRYPOINT(Step):
-    """Configure a container that will run as an executable.
-
-    https://docs.docker.com/engine/reference/builder/#entrypoint
-    """
-    __slots__ = ('cmd', 'shell')
-
-    def __init__(self, cmd: str | list[str], shell: bool = False) -> None:
-        assert cmd
-        self.cmd = cmd
-        self.shell = shell
-
-    def as_str(self) -> str:
-        return f'ENTRYPOINT {format_shell_cmd(self.cmd, shell=self.shell)}'
-
-
-class VOLUME(Step):
-    """
-    Create a mount point with the specified name and mark it as holding
-    externally mounted volumes from native host or other containers.
-
-    https://docs.docker.com/engine/reference/builder/#volume
-    """
-    __slots__ = ('paths', )
-
-    def __init__(self, *paths: str | PosixPath) -> None:
-        assert paths
-        self.paths = paths
-
-    def as_str(self) -> str:
-        result = 'VOLUME'
-        parts = [str(path) for path in self.paths]
-        return f'{result} {json_if_spaces(parts)}'
-
-
-class USER(Step):
+class USER(BuildStep):
     """Set the user name to use as the default user for the remainder of the stage.
 
     https://docs.docker.com/engine/reference/builder/#user
@@ -381,7 +287,7 @@ class USER(Step):
         return result
 
 
-class WORKDIR(Step):
+class WORKDIR(BuildStep):
     """
     Set the working directory for any RUN, CMD, ENTRYPOINT, COPY and ADD instructions that follow.
 
@@ -399,7 +305,7 @@ class WORKDIR(Step):
         return f'WORKDIR {self.path}'
 
 
-class ONBUILD(Step):
+class ONBUILD(BuildStep):
     """
     Add to the image a trigger instruction to be executed at a later time,
     when the image is used as the base for another build.
@@ -417,70 +323,7 @@ class ONBUILD(Step):
         return f'ONBUILD {self.trigger.as_str()}'
 
 
-class STOPSIGNAL(Step):
-    """Sets the system call signal that will be sent to the container to exit.
-
-    https://docs.docker.com/engine/reference/builder/#stopsignal
-    """
-    __slots__ = ('signal',)
-
-    def __init__(self, signal: str | int | Signals) -> None:
-        assert signal
-        self.signal = signal
-
-    def as_str(self) -> str:
-        return f'STOPSIGNAL {self.signal}'
-
-
-class HEALTHCHECK(Step):
-    """Check container health by running a command inside the container.
-
-    https://docs.docker.com/engine/reference/builder/#healthcheck
-    """
-    __slots__ = ('cmd', 'interval', 'timeout', 'start_period', 'retries', 'shell')
-
-    def __init__(
-        self,
-        cmd: str | list[str] | None,
-        *,
-        interval: timedelta | str = '30s',
-        timeout: timedelta | str = '30s',
-        start_period: timedelta | str = '0s',
-        retries: int = 3,
-        shell: bool = False,
-    ) -> None:
-        assert cmd or cmd is None
-        self.cmd = cmd
-        self.interval = interval
-        self.timeout = timeout
-        self.start_period = start_period
-        self.retries = retries
-        self.shell = shell
-
-    def as_str(self) -> str:
-        result = 'HEALTHCHECK'
-        if self.interval != '30s':
-            result += f' --interval={self._convert_duration(self.interval)}'
-        if self.timeout != '30s':
-            result += f' --timeout={self._convert_duration(self.timeout)}'
-        if self.start_period != '0s':
-            result += f' --start-period={self._convert_duration(self.start_period)}'
-        if self.retries != 3:
-            result += f' --retries={self.retries}'
-        if self.cmd is None:
-            result += ' NONE'
-        else:
-            result += f' CMD {format_shell_cmd(self.cmd, shell=self.shell)}'
-        return result
-
-    @staticmethod
-    def _convert_duration(td: timedelta | str) -> str:
-        if isinstance(td, str):
-            return td
-        return f'{td.seconds}s'
-
-
-class SHELL(Step):
+class SHELL(BuildStep):
     """Override the default shell used for the shell form of commands.
 
     It affects shell form commands inside of RUN, CMD, and ENTRYPOINT instructions.
