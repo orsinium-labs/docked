@@ -5,9 +5,10 @@ import shlex
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ._stage import Stage
+    from ._types import BaseImage
 
 
-def format_stage_name(stage: Stage | str) -> str:
+def format_stage_name(stage: Stage | BaseImage | str) -> str:
     if isinstance(stage, str):
         return stage
     name = stage.name

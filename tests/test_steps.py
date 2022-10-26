@@ -7,13 +7,6 @@ import docked as d
 
 @pytest.mark.parametrize('given, expected', [
     # ---
-    (d.FROM('alpine'), 'FROM alpine'),
-    (d.FROM('alpine', platform='linux/arm64'), 'FROM --platform=linux/arm64 alpine'),
-    (d.FROM('alpine', 'latest'), 'FROM alpine:latest'),
-    (d.FROM('alpine', digest='e9a2035f9d0d7ce'), 'FROM alpine@e9a2035f9d0d7ce'),
-    (d.FROM('ubuntu', name='base'), 'FROM ubuntu AS base'),
-
-    # ---
     (d.ARG('user'), 'ARG user'),
     (d.ARG('user', 'root'), 'ARG user=root'),
     (d.ARG('user', 'gram orsinium'), 'ARG user=gram orsinium'),  # is that right?

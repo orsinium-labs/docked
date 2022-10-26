@@ -10,46 +10,7 @@ if TYPE_CHECKING:
     from typing import Literal
 
     from .._stage import Stage
-    from .._types import Checksum, Mount
-
-
-class FROM(BuildStep):
-    """Initializes a new build stage and sets the Base Image for subsequent instructions.
-
-    https://docs.docker.com/engine/reference/builder/#from
-    """
-    __slots__ = ('image', 'tag', 'digest', 'platform', 'name')
-
-    def __init__(
-        self,
-        image: str,
-        tag: str | None = None,
-        *,
-        digest: str | None = None,
-        platform: str | None = None,
-        name: str | None = None,
-    ) -> None:
-        assert image
-        if tag and digest:
-            raise ValueError('cannot set both tag and digest')
-        self.image = image
-        self.tag = tag
-        self.digest = digest
-        self.platform = platform
-        self.name = name
-
-    def as_str(self) -> str:
-        result = 'FROM'
-        if self.platform:
-            result += f' --platform={self.platform}'
-        result += f' {self.image}'
-        if self.tag:
-            result += f':{self.tag}'
-        if self.digest:
-            result += f'@{self.digest}'
-        if self.name:
-            result += f' AS {self.name}'
-        return result
+    from .._types import Checksum, Mount, BaseImage
 
 
 class ARG(BuildStep):
@@ -260,7 +221,7 @@ class COPY(_BaseAdd):
 
     https://docs.docker.com/engine/reference/builder/#copy
     """
-    from_stage: Stage | str | None = None
+    from_stage: Stage | BaseImage | str | None = None
 
     def as_str(self) -> str:
         result = 'COPY'

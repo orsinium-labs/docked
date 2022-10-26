@@ -12,6 +12,28 @@ if TYPE_CHECKING:
     from ._stage import Stage
 
 
+class BaseImage:
+    __slots__ = ('name', 'tag', 'digest')
+
+    def __init__(
+        self,
+        name: str,
+        tag: str | None = None,
+        digest: str | None = None,
+    ) -> None:
+        assert not tag or not digest, 'cannot set digest and tag at the same time'
+        self.name = name
+        self.tag = tag
+        self.digest = digest
+
+    def __str__(self) -> str:
+        if self.tag:
+            return f'{self.name}:{self.tag}'
+        if self.digest:
+            return f'{self.name}@{self.digest}'
+        return self.name
+
+
 class Checksum:
     """Hash of remote content for DOWNLOAD.
     """

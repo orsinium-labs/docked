@@ -7,8 +7,10 @@ import docked as d
 import docker
 
 stage = d.Stage(
-    d.FROM('busybox', tag='latest'),
-    d.CMD(['echo', 'hello world!'])
+    base=d.BaseImage('busybox'),
+    run=[
+        d.CMD(['echo', 'hello world!'])
+    ],
 )
 image = d.Image(stage)
 

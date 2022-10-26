@@ -1,10 +1,9 @@
 
 from ._stage import Stage
 from ._image import Image
-from ._types import Checksum, Mount, BindMount, CacheMount, SecretMount, SSHMount
+from ._types import Checksum, Mount, BindMount, CacheMount, SecretMount, SSHMount, BaseImage
 from ._steps import (
     Step,
-    FROM,
     ARG,
     RUN,
     CMD,
@@ -26,6 +25,7 @@ from ._steps import (
 __version__ = '0.1.0'
 __all__ = [
     # classes and things
+    'BaseImage',
     'BindMount',
     'CacheMount',
     'Checksum',
@@ -46,7 +46,6 @@ __all__ = [
     'ENV',
     'EXPOSE',
     'EXTRACT',
-    'FROM',
     'HEALTHCHECK',
     'LABEL',
     'ONBUILD',

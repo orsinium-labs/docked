@@ -6,8 +6,10 @@ See also `use_docker_py.py` and `use_python_on_whales.py` for other ways to buil
 import docked as d
 
 stage = d.Stage(
-    d.FROM('busybox', tag='latest'),
-    d.CMD(['echo', 'hello world!'])
+    base=d.BaseImage('busybox'),
+    run=[
+        d.CMD(['echo', 'hello world!'])
+    ],
 )
 image = d.Image(stage)
 

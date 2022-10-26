@@ -4,20 +4,6 @@ import docked as d
 
 
 @pytest.mark.parametrize('given, expected', [
-    # FROM
-    (
-        [d.LABEL('a', 'b'), d.FROM('c', 'd')],
-        'E0101: Only ARG can go before FROM but found LABEL',
-    ),
-    (
-        [d.FROM('ubuntu')],
-        'W0102: Specify base image tag',
-    ),
-    (
-        [d.FROM('ubuntu', 'latest')],
-        'W0103: Base image tag should not be `latest`',
-    ),
-
     # WORKDIR
     (
         [d.WORKDIR('hello')],
@@ -40,7 +26,7 @@ import docked as d
 
 ])
 def test_linter(given: list, expected: str) -> None:
-    image = d.Image(d.Stage(build=given))
+    image = d.Image(d.Stage(base=d.BaseImage('alpine'), build=given))
     stdout = StringIO()
     code = image.lint(exit_on_failure=False, stdout=stdout)
     assert code == 1

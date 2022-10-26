@@ -9,8 +9,10 @@ import docked as d
 from python_on_whales import docker
 
 stage = d.Stage(
-    d.FROM('busybox', tag='latest'),
-    d.CMD(['echo', 'hello world!'])
+    base=d.BaseImage('busybox'),
+    run=[
+        d.CMD(['echo', 'hello world!'])
+    ],
 )
 image = d.Image(stage)
 
