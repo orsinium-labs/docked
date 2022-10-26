@@ -8,10 +8,11 @@ if TYPE_CHECKING:
     from ._types import BaseImage
 
 
-def format_stage_name(stage: Stage | BaseImage | str) -> str:
-    if isinstance(stage, str):
-        return stage
-    return stage.name
+def format_stage_name(stage: Stage | BaseImage) -> str:
+    from ._stage import Stage
+    if isinstance(stage, Stage):
+        return stage.name
+    return str(stage)
 
 
 def format_shell_cmd(cmd: list[str] | str, *, shell: bool) -> str:

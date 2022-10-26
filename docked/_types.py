@@ -77,7 +77,7 @@ class BindMount(Mount):
     """
     target: str | PosixPath
     source: str | PosixPath | None = None
-    from_stage: Stage | str | None = None
+    from_stage: Stage | BaseImage | None = None
     allow_write: bool = False
 
     @property
@@ -105,7 +105,7 @@ class CacheMount(Mount):
     id: str | None = None
     allow_write: bool = True
     sharing: Literal['shared', 'private', 'locked'] = 'shared'
-    from_stage: Stage | str | None = None
+    from_stage: Stage | BaseImage | None = None
     source: str | PosixPath | None = None
     mode: int = 0o755
     uid: int = 0

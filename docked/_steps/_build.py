@@ -221,7 +221,7 @@ class COPY(_BaseAdd):
 
     https://docs.docker.com/engine/reference/builder/#copy
     """
-    from_stage: Stage | BaseImage | str | None = None
+    from_stage: Stage | BaseImage | None = None
 
     def as_str(self) -> str:
         result = 'COPY'

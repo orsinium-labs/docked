@@ -67,7 +67,7 @@ import docked as d
     (d.COPY('files', '/somedir/', chown='gram:docker'), 'COPY --chown=gram:docker files /somedir/'),
     (d.COPY('files', '/somedir/', chown=1), 'COPY --chown=1 files /somedir/'),
     (d.COPY('files/', '/', link=True), 'COPY --link files/ /'),
-    (d.COPY('files/', '/', from_stage='build'), 'COPY --from=build files/ /'),
+    (d.COPY('files/', '/', from_stage=d.BaseImage('build')), 'COPY --from=build files/ /'),
 
     # ---
     (d.ENTRYPOINT('nginx'), 'ENTRYPOINT ["nginx"]'),
