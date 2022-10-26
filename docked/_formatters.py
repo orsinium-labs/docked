@@ -11,10 +11,7 @@ if TYPE_CHECKING:
 def format_stage_name(stage: Stage | BaseImage | str) -> str:
     if isinstance(stage, str):
         return stage
-    name = stage.name
-    if name is None:
-        raise ValueError('the stage must have a name to copy from it')
-    return name
+    return stage.name
 
 
 def format_shell_cmd(cmd: list[str] | str, *, shell: bool) -> str:

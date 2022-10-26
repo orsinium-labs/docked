@@ -13,7 +13,7 @@ class Stage:
     def __init__(
         self,
         *,
-        base: BaseImage | str,
+        base: BaseImage | Stage | str,
         name: str = 'main',
         platform: str | None = None,
         build: list[BuildStep] | None = None,
