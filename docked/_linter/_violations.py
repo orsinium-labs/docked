@@ -4,23 +4,42 @@ from ._violation import Violation
 
 DOCKER_GUIDE = 'https://docs.docker.com/develop/develop-images/dockerfile_best-practices/'
 
-WORKDIR_01 = Violation(
-    code=201,
-    severity=WARNING,
-    summary='WORKDIR path should be absolute',
-    url=f'{DOCKER_GUIDE}#workdir'
-)
+# ARG           01
+# CLONE         02
+# CMD           03
+# COPY          04
+# DOWNLOAD      05
+# ENTRYPOINT    06
+# ENV           07
+# EXPOSE        08
+# EXTRACT       09
+# HEALTHCHECK   10
+# ONBUILD       11
+# RUN           12
 
 RUN_01 = Violation(
-    code=301,
+    code=1201,
     severity=INFO,
     summary='Do not RUN {bin}',
 )
 RUN_02 = Violation(
-    code=302,
+    code=1202,
     severity=WARNING,
     summary='Do not use sudo',
     url=f'{DOCKER_GUIDE}#user',
+)
+
+# SHELL         13
+# STOPSIGNAL    14
+# USER          15
+# VOLUME        16
+# WORKDIR       17
+
+WORKDIR_01 = Violation(
+    code=1701,
+    severity=WARNING,
+    summary='WORKDIR path should be absolute',
+    url=f'{DOCKER_GUIDE}#workdir'
 )
 
 

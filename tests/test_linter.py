@@ -4,24 +4,40 @@ import docked as d
 
 
 @pytest.mark.parametrize('given, expected', [
-    # WORKDIR
-    (
-        [d.WORKDIR('hello')],
-        'W0201: WORKDIR path should be absolute',
-    ),
-
-    # RUN
+    # ARG           01
+    # CLONE         02
+    # CMD           03
+    # COPY          04
+    # DOWNLOAD      05
+    # ENTRYPOINT    06
+    # ENV           07
+    # EXPOSE        08
+    # EXTRACT       09
+    # HEALTHCHECK   10
+    # ONBUILD       11
+    # RUN           12
     (
         [d.RUN('vim ./hi.txt')],
-        'I0301: Do not RUN vim',
+        'I1201: Do not RUN vim',
     ),
     (
         [d.RUN('sudo echo 1')],
-        'W0302: Do not use sudo',
+        'W1202: Do not use sudo',
     ),
     (
         [d.RUN('sudo')],
-        'W0302: Do not use sudo',
+        'W1202: Do not use sudo',
+    ),
+
+    # SHELL         13
+    # STOPSIGNAL    14
+    # USER          15
+    # VOLUME        16
+
+    # WORKDIR       17
+    (
+        [d.WORKDIR('hello')],
+        'W1701: WORKDIR path should be absolute',
     ),
 
 ])

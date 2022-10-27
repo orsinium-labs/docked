@@ -39,7 +39,6 @@ __all__ = [
     'ONBUILD',
     'RUN',
     'SHELL',
-    'SSHMount',
     'STOPSIGNAL',
     'USER',
     'VOLUME',
