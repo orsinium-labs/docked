@@ -69,11 +69,33 @@ def _(step: steps.RUN, ctx: Context) -> Iterator[Violation]:
         if bin == 'sudo':
             yield vs.RUN_02
             if len(cmd) > 1:
-                bin = cmd[1]
+                cmd = cmd[1:]
+                bin = cmd[0]
         if bin in BAD_COMMANDS:
             yield vs.RUN_01.format(bin=bin)
+
+        if bin in ('apt', 'apt-get'):
+            if cmd[1] in ('upgrade', 'dist-upgrade'):
+                yield vs.RUN_03.format(subcmd=cmd[1])
+            if cmd[1] == 'update' and not step.rest:
+                yield vs.RUN_04
 
 
 @check_step.register
 def _(step: steps.USER, ctx: Context) -> Iterator[Violation]:
-    ...
+    if ctx.is_last and step.user in (0, 'root'):
+        yield vs.USER_01
+
+
+@check_step.register
+def _(step: steps.CMD, ctx: Context) -> Iterator[Violation]:
+    if not ctx.is_last:
+        yield vs.CMD_01
+    if step.shell:
+        yield vs.CMD_02
+
+
+@check_step.register
+def _(step: steps.EXPOSE, ctx: Context) -> Iterator[Violation]:
+    if not 0 < step.port < 65535:
+        yield vs.EXPOSE_01
