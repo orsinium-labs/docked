@@ -27,11 +27,6 @@ import docked as d
     (d.CMD(['echo', '1']), 'CMD ["echo", "1"]'),
 
     # ---
-    (d.LABEL('version', '1.0'), 'LABEL version=1.0'),
-    (d.LABEL('version', ''), 'LABEL version=""'),
-    (d.LABEL('author', 'gram orsinium'), 'LABEL author="gram orsinium"'),
-
-    # ---
     (d.EXPOSE(80), 'EXPOSE 80/tcp'),
     (d.EXPOSE(8125, 'udp'), 'EXPOSE 8125/udp'),
 

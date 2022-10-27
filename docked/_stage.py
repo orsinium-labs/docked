@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 
 class Stage:
-    __slots__ = ('name', 'base', 'platform', 'build', 'run')
+    __slots__ = ('name', 'base', 'platform', 'build', 'run', 'labels')
 
     def __init__(
         self,
@@ -18,18 +18,21 @@ class Stage:
         platform: str | None = None,
         build: list[BuildStep] | None = None,
         run: list[RunStep] | None = None,
+        labels: dict[str, str] | None = None,
     ) -> None:
         self.name = name
         self.base = base
         self.platform = platform
         self.build = build or []
         self.run = run or []
+        self.labels = labels or {}
 
     def as_str(self) -> str:
         return '\n'.join(self.iter_lines())
 
     def iter_lines(self) -> Iterator[str]:
         yield self._from
+        yield from self._labels
         step: Step
         for step in self.build:
             yield step.as_str()
@@ -55,6 +58,14 @@ class Stage:
         if self.name:
             result += f' AS {self.name}'
         return result
+
+    @property
+    def _labels(self) -> Iterator[str]:
+        for name, value in self.labels.items():
+            if not value or ' ' in value:
+                yield f'LABEL {name}="{value}"'
+            else:
+                yield f'LABEL {name}={value}'
 
     def __str__(self) -> str:
         return self.as_str()

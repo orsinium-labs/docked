@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from pathlib import PosixPath
 from typing import TYPE_CHECKING
 from .._formatters import format_stage_name, format_shell_cmd, json_if_spaces
-from ._base import BuildStep, Step
+from ._base import BuildStep
 
 if TYPE_CHECKING:
     from typing import Literal
@@ -85,27 +85,6 @@ class RUN(BuildStep):
         if self.network != 'default':
             return '1.1'
         return '1.0'
-
-
-class LABEL(BuildStep):
-    """Add metadata to an image
-
-    https://docs.docker.com/engine/reference/builder/#label
-    """
-    __slots__ = ('name', 'value')
-
-    def __init__(self, name: str, value: str) -> None:
-        assert name
-        self.name = name
-        self.value = value
-
-    def as_str(self) -> str:
-        result = f'LABEL {self.name}'
-        value = self.value
-        if not value or ' ' in value:
-            value = f'"{value}"'
-        result += f'={value}'
-        return result
 
 
 class ENV(BuildStep):
@@ -275,9 +254,8 @@ class ONBUILD(BuildStep):
     """
     __slots__ = ('trigger',)
 
-    def __init__(self, trigger: Step) -> None:
-        if isinstance(trigger, ONBUILD):
-            raise ValueError('cannot use ONBUILD inside ONBUILD')
+    def __init__(self, trigger: BuildStep) -> None:
+        assert not isinstance(trigger, ONBUILD), 'cannot use ONBUILD inside ONBUILD'
         self.trigger = trigger
 
     def as_str(self) -> str:
