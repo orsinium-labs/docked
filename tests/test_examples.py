@@ -7,6 +7,7 @@ TESTS_DIR = Path(__file__).parent
 
 
 @pytest.mark.parametrize('name', [
+    'cowsay',
     'hello_world',
     'httpie',
     'hugo',

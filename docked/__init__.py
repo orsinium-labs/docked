@@ -1,3 +1,9 @@
+"""
+A human-friendly alternative to Dockerfile.
+
+It's a Python library for generating Docker images,
+with API designed to be safe, secure, and easy-to-use correctly.
+"""
 
 from . import cmd
 from ._stage import Stage
