@@ -22,7 +22,7 @@ class Violation:
     def severity_text(self) -> str:
         return logging.getLevelName(self.severity)
 
-    def format(self, **kwargs) -> Violation:
+    def format(self, **kwargs: str) -> Violation:
         return replace(self, summary=self.summary.format(**kwargs))
 
     def __str__(self) -> str:
