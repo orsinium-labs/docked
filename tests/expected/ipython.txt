@@ -1,0 +1,6 @@
+# syntax=docker/dockerfile:1.0
+# escape=\
+
+FROM python:3.11-alpine AS main
+RUN python3 -m pip --disable-pip-version-check install ipython
+CMD ["ipython"]

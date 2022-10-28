@@ -1,0 +1,13 @@
+# syntax=docker/dockerfile-upstream:master-labs
+# escape=\
+
+FROM debian:bookworm-slim AS generate
+ADD https://github.com/gohugoio/hugoBasicExample.git /source
+ADD https://github.com/halogenica/beautifulhugo.git /source/themes/theme
+ADD https://github.com/gohugoio/hugo/releases/download/v0.104.3/hugo_0.104.3_linux-amd64.deb /root/hugo.deb
+WORKDIR /source
+RUN dpkg -i /root/hugo.deb && \
+    hugo -t theme --baseURL /
+
+FROM nginx:stable-alpine AS serve
+COPY --from=generate /source/public /usr/share/nginx/html

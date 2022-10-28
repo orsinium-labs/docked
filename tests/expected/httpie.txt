@@ -1,0 +1,7 @@
+# syntax=docker/dockerfile:1.0
+# escape=\
+
+FROM python:3.10-alpine AS main
+RUN python3 -m pip --disable-pip-version-check install httpie==3.2.1
+ENTRYPOINT ["http", "--print", "hb"]
+CMD ["--help"]

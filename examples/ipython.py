@@ -18,7 +18,7 @@ from argparse import ArgumentParser
 import docked as d
 
 
-def get_image(python_version: str) -> d.Image:
+def get_image(python_version: str = '3.11') -> d.Image:
     stage = d.Stage(
         base=d.BaseImage('python', f'{python_version}-alpine'),
         build=[
