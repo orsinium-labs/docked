@@ -1,0 +1,111 @@
+# https://taskfile.dev/
+version: "3"
+
+vars:
+  PYTHON: python3
+  VENVS: .venvs
+  FLITENV: "{{.VENVS}}/base/bin/flitenv --venvs={{.VENVS}}"
+
+env:
+  FLIT_ROOT_INSTALL: "1"
+
+tasks:
+  install:base:
+    status:
+      - test -f {{.VENVS}}/base/bin/flitenv
+    cmds:
+      - "{{.PYTHON}} -m venv {{.VENVS}}/base"
+      - >
+        {{.VENVS}}/base/bin/python3 -m pip install flitenv
+  install:test:
+    sources:
+      - pyproject.toml
+    deps:
+      - install:base
+    cmds:
+      - >
+        {{.FLITENV}} test install
+  install:lint:
+    sources:
+      - pyproject.toml
+    deps:
+      - install:base
+    cmds:
+      - >
+        {{.FLITENV}} lint install
+  install:docs:
+    sources:
+      - pyproject.toml
+    deps:
+      - install:base
+    cmds:
+      - >
+        {{.FLITENV}} docs install
+
+  pytest:
+    desc: "run Python tests"
+    deps:
+      - install:test
+    cmds:
+      - "{{.FLITENV}} test run pytest {{.CLI_ARGS}}"
+  flake8:
+    desc: "lint Python code"
+    deps:
+      - install:lint
+    cmds:
+      - "{{.FLITENV}} lint run flake8 {{.CLI_ARGS}} ."
+  mypy:
+    desc: "check type annotations"
+    deps:
+      - install:lint
+    cmds:
+      - "{{.FLITENV}} lint run mypy {{.CLI_ARGS}}"
+  unify:
+    desc: "convert double quotes to single ones"
+    deps:
+      - install:lint
+    cmds:
+      - "{{.FLITENV}} lint run unify -r -i --quote=\\' {{.CLI_ARGS}} docked examples tests"
+  isort:
+    desc: "sort imports"
+    deps:
+      - install:lint
+    cmds:
+      - "{{.FLITENV}} lint run isort {{.CLI_ARGS}} ."
+  isort:check:
+    desc: "sort imports"
+    deps:
+      - install:lint
+    cmds:
+      - "{{.FLITENV}} lint run isort --check {{.CLI_ARGS}} ."
+
+  sphinx:
+    desc: "generate documentation"
+    deps:
+      - install:docs
+    cmds:
+      - rm -rf docs/build
+      - "{{.FLITENV}} docs run sphinx-build -W docs docs/build {{.CLI_ARGS}}"
+
+  # groups
+  format:
+    desc: "run all code formatters"
+    cmds:
+      - task: isort
+      - task: unify
+  lint:
+    desc: "run all linters"
+    cmds:
+      - task: flake8
+      - task: mypy
+      - task: isort:check
+  test:
+    desc: "run all tests"
+    cmds:
+      - task: pytest
+  all:
+    desc: "run all code formatters, linters, and tests"
+    cmds:
+      - task: format
+      - task: lint
+      - task: test
