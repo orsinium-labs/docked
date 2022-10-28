@@ -1,6 +1,9 @@
 """
 The examples shows how to create a nice image for a CLI tool.
 
+HTTPie:
+    https://httpie.io/
+
 Usage:
 
     python3 examples/httpie.py | docker buildx build --tag=httpie:latest -
