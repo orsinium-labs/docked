@@ -80,7 +80,7 @@ class RUN(BuildStep):
     def min_version(self) -> str:
         if self.security != 'sandbox':
             return 'labs'
-        if self.mount != 'bind':
+        if self.mount is not None:
             return '1.2'
         if self.network != 'default':
             return '1.1'

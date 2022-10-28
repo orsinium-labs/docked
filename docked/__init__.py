@@ -1,4 +1,5 @@
 
+from . import cmd
 from ._stage import Stage
 from ._image import Image
 from ._types import Checksum, Mount, BindMount, CacheMount, SecretMount, SSHMount, BaseImage
@@ -28,6 +29,7 @@ __all__ = [
     'BindMount',
     'CacheMount',
     'Checksum',
+    'cmd',
     'Image',
     'Mount',
     'SecretMount',
