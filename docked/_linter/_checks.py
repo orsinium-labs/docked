@@ -6,13 +6,15 @@ Ideas for checks come from these linters:
 """
 
 from __future__ import annotations
+
+import shlex
 from dataclasses import dataclass
 from functools import singledispatch
-import shlex
 from typing import Iterator
-from ._violation import Violation
-from . import _violations as vs
+
 from .. import _steps as steps
+from . import _violations as vs
+from ._violation import Violation
 
 
 BAD_COMMANDS = frozenset({

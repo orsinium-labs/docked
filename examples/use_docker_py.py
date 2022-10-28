@@ -3,8 +3,10 @@ This example shows how to build an image with the official Docker SDK.
 
 https://github.com/docker/docker-py
 """
-import docked as d
 import docker
+
+import docked as d
+
 
 stage = d.Stage(
     base=d.BaseImage('busybox'),

@@ -1,8 +1,11 @@
 from __future__ import annotations
+
 from itertools import chain
 from typing import TYPE_CHECKING, Iterator
 
 from ._steps import BuildStep, RunStep, Step
+
+
 if TYPE_CHECKING:
     from ._types import BaseImage
 

@@ -1,7 +1,7 @@
 from __future__ import annotations
+
 from dataclasses import dataclass
 from pathlib import PosixPath
-
 from typing import TYPE_CHECKING
 
 from ._formatters import format_stage_name
@@ -9,6 +9,7 @@ from ._formatters import format_stage_name
 
 if TYPE_CHECKING:
     from typing import Literal
+
     from ._stage import Stage
 
 

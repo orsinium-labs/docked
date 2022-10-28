@@ -1,7 +1,9 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING, Iterator
 
-from ._checks import check_step, Context
+from ._checks import Context, check_step
+
 
 if TYPE_CHECKING:
     from .._image import Image

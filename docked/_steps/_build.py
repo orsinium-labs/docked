@@ -1,16 +1,18 @@
 from __future__ import annotations
-from dataclasses import dataclass
 
+from dataclasses import dataclass
 from pathlib import PosixPath
 from typing import TYPE_CHECKING
-from .._formatters import format_stage_name, format_shell_cmd, json_if_spaces
+
+from .._formatters import format_shell_cmd, format_stage_name, json_if_spaces
 from ._base import BuildStep
+
 
 if TYPE_CHECKING:
     from typing import Literal
 
     from .._stage import Stage
-    from .._types import Checksum, Mount, BaseImage
+    from .._types import BaseImage, Checksum, Mount
 
 
 class ARG(BuildStep):

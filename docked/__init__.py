@@ -6,27 +6,16 @@ with API designed to be safe, secure, and easy-to-use correctly.
 """
 
 from . import cmd
-from ._stage import Stage
 from ._image import Image
-from ._types import Checksum, Mount, BindMount, CacheMount, SecretMount, SSHMount, BaseImage
+from ._stage import Stage
 from ._steps import (
-    Step,
-    ARG,
-    RUN,
-    CMD,
-    EXPOSE,
-    ENV,
-    DOWNLOAD, EXTRACT, CLONE,
-    COPY,
-    ENTRYPOINT,
-    VOLUME,
-    USER,
-    WORKDIR,
-    ONBUILD,
-    STOPSIGNAL,
-    HEALTHCHECK,
-    SHELL,
+    ARG, CLONE, CMD, COPY, DOWNLOAD, ENTRYPOINT, ENV, EXPOSE, EXTRACT,
+    HEALTHCHECK, ONBUILD, RUN, SHELL, STOPSIGNAL, USER, VOLUME, WORKDIR, Step,
 )
+from ._types import (
+    BaseImage, BindMount, CacheMount, Checksum, Mount, SecretMount, SSHMount,
+)
+
 
 __version__ = '0.1.0'
 __all__ = [

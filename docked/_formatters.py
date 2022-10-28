@@ -1,8 +1,10 @@
 from __future__ import annotations
+
 import json
 import shlex
-
 from typing import TYPE_CHECKING
+
+
 if TYPE_CHECKING:
     from ._stage import Stage
     from ._types import BaseImage

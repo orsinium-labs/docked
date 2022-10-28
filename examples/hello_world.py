@@ -13,6 +13,7 @@ Directly build and run Docker image without saving a file:
 """
 import docked as d
 
+
 stage = d.Stage(
     base=d.BaseImage('busybox'),
     run=[

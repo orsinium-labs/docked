@@ -13,6 +13,7 @@ Usage:
 
 import docked as d
 
+
 HTTPIE_VERSION = '3.2.1'
 
 stage = d.Stage(

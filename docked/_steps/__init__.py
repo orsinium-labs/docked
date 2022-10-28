@@ -1,25 +1,10 @@
-from ._base import Step, BuildStep, RunStep
+from ._base import BuildStep, RunStep, Step
 from ._build import (
-    ARG,
-    CLONE,
-    COPY,
-    DOWNLOAD,
-    ENV,
-    EXTRACT,
-    ONBUILD,
-    RUN,
-    SHELL,
-    USER,
+    ARG, CLONE, COPY, DOWNLOAD, ENV, EXTRACT, ONBUILD, RUN, SHELL, USER,
     WORKDIR,
 )
-from ._run import (
-    CMD,
-    ENTRYPOINT,
-    EXPOSE,
-    HEALTHCHECK,
-    STOPSIGNAL,
-    VOLUME,
-)
+from ._run import CMD, ENTRYPOINT, EXPOSE, HEALTHCHECK, STOPSIGNAL, VOLUME
+
 
 __all__ = [
     'Step',

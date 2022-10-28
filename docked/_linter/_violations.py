@@ -1,6 +1,8 @@
 
 from logging import ERROR, INFO, WARNING
+
 from ._violation import Violation
+
 
 DOCKER_GUIDE = 'https://docs.docker.com/develop/develop-images/dockerfile_best-practices/'
 

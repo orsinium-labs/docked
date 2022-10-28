@@ -1,7 +1,9 @@
 from datetime import timedelta
 from pathlib import PosixPath
 from signal import SIGKILL
+
 import pytest
+
 import docked as d
 
 

@@ -2,8 +2,10 @@ from __future__ import annotations
 
 from pathlib import PosixPath
 from typing import TYPE_CHECKING
+
 from .._formatters import format_shell_cmd, json_if_spaces
 from ._base import RunStep
+
 
 if TYPE_CHECKING:
     from datetime import timedelta

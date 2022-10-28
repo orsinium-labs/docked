@@ -5,8 +5,10 @@ The python-on-whales is a type-safe Python wrapper around Docker CLI.
 
 https://github.com/gabrieldemarmiesse/python-on-whales
 """
-import docked as d
 from python_on_whales import docker
+
+import docked as d
+
 
 stage = d.Stage(
     base=d.BaseImage('busybox'),

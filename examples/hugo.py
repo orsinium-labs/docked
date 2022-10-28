@@ -18,6 +18,7 @@ Usage:
 
 import docked as d
 
+
 HUGO_VERSION = '0.104.3'
 HUGO_DEB_URL = f'https://github.com/gohugoio/hugo/releases/download/v{HUGO_VERSION}/hugo_{HUGO_VERSION}_linux-amd64.deb'  # noqa
 WEBSITE_REPO = 'https://github.com/gohugoio/hugoBasicExample.git'

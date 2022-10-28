@@ -1,11 +1,13 @@
 from __future__ import annotations
-from pathlib import Path
+
 import subprocess
 import sys
+from pathlib import Path
 from tempfile import NamedTemporaryFile
-
 from typing import TYPE_CHECKING, Container, Iterator, TextIO, overload
+
 from ._linter import lint
+
 
 if TYPE_CHECKING:
     from ._stage import Stage
