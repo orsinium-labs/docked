@@ -24,8 +24,8 @@ stage = d.Stage(
         ),
     ],
     run=[
-        d.ENTRYPOINT("http --print hb"),
-        d.CMD("--help"),
+        d.ENTRYPOINT('http --print hb'),
+        d.CMD('--help'),
     ],
 )
 image = d.Image(stage)

@@ -18,15 +18,17 @@ from ._violation import Violation
 
 
 BAD_COMMANDS = frozenset({
-    "free",
-    "kill",
-    "mount",
-    "ps",
-    "service",
-    "shutdown",
-    "ssh",
-    "top",
-    "vim",
+    'free',
+    'kill',
+    'mount',
+    'nano',
+    'ps',
+    'service',
+    'shutdown',
+    'ssh',
+    'top',
+    'vi',
+    'vim',
 })
 
 
