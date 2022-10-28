@@ -1,0 +1,8 @@
+# Design choices
+
+The starting point for the project was one-to-one mapping of Dockefile instructions to Python. And then we made a lot of small changes to the API. THis page coers why certain decisions were made:
+
+1. FROM instruction does more than it should. It not only defines the base image, as it initially did, but it also defines the target platform and the stage name. And also it is required and must go first. In a sense, because being required, it became a go-to storage for whatever stage or image metadata Docker authors want to allow to be defined (that must be available before build, unlike LABEL). Hence it made sense to get rid of FROM and move all information it can contain into the stage itself.
+1. LABELs are also part of image metadata. It has no effect on how the image is built and run. So we made it a Stage attribute. We considered to move them into Image but then it will get messy with multi-stage builds when you can --target diffent stages produceing multiple container images from one Image.
+1. ADD does a lot of things, and newcomers often confuse it with COPY And rightly so, ADD is the same as COPY but does more things. Interestingly enough, Docker team is aware of it being an isse, that's why COPY was added later when ADD already was there. So, we've split the big fat ADD to a few more atomic commands: EXTRACT, CLONE, and DOWNLOAD. Arguably, the're not really needed for Debian-based images when you already have git, curl, and whatnot, but that can come in handy when using more bare-bone base images, without a need to make mult-stage builds just for that.
+1. We wanted to remove everything that is deprecated, and will bravely remove everything that becomes deprecated. So far, it's only MAINTAINER instruction.
