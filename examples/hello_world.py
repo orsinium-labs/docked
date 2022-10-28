@@ -7,7 +7,7 @@ Generate a Dockerfile:
 
 Directly build and run Docker image without saving a file:
 
-    python3 ./examples/hello_world.py | docker build --tag=hello:latest -
+    python3 ./examples/hello_world.py | docker buildx build --tag=hello:latest -
     docker run hello:latest
 
 """

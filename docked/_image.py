@@ -126,7 +126,7 @@ class Image:
                 continue
             print(v, file=stdout)
             count += 1
-        if exit_on_failure:
+        if exit_on_failure and count:
             sys.exit(min(count, 100))
         return count
 
