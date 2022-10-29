@@ -2,7 +2,7 @@
 
 The project started as one-to-one mapping of Dockerfile instructions to Python, and then we evolved some  components to provide a more friendly and safe API. If you're familiar with Dockerfile and looking for a quick start with docked, there are some differences that you should know:
 
-1. There is no FROM. Instead, pass arguments (base, name, and platform) into Stage.
+1. There is no FROM. Instead, pass arguments (`base`, `name`, and `platform`) into Stage.
 1. There is no MAINTAINER. Use labels instead.
 1. There is no LABEL. Pass `labels` argument into Stage instead.
 1. There is no ADD. Instead, use COPY, EXTRACT, CLONE, or DOWNLOAD.
