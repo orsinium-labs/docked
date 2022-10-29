@@ -2,9 +2,9 @@
 
 A human-friendly alternative to Dockerfile. It's a Python library for generating Docker images, with API designed to be safe, secure, and easy-to-use correctly.
 
-Features:
+**Features:**
 
-+ **Just a Python library**. No custom syntax. No monkey-patching, no magic. Get the full power of Python.
++ **Just a Python library**. No custom syntax, no monkey-patching, no magic. Get the full power of Python.
 + **100% type-safe**. The code base is fully type annotated and type checked, and we put a lot of effort to make the best API that makes invalid or insecure usage impossible.
 + **Supports all versions** of Dockerfile and Containerfile standards and syntax.
 + Automatically picks the most **compatible syntax** version based on the features you use.
@@ -27,7 +27,7 @@ Our goal was to provide the best possible IDE assistance to the users. All API i
 ## Installation
 
 ```bash
-pytohn3 -m pip install docked
+python3 -m pip install docked
 ```
 
 ## Usage
@@ -51,6 +51,7 @@ stage = d.Stage(
 image = d.Image(stage)
 
 if __name__ == '__main__':
+    image.lint()
     print(image)
 ```
 
@@ -63,6 +64,7 @@ What's happening:
 1. `d.RUN(...)` is the same as [RUN](https://docs.docker.com/engine/reference/builder/#run) in Docker. It tells to run a list of the given shell-commands when building the image.
 1. `d.cmd.pip_install` is a convenience function that will produce a command for `pip` to install the given packages. It's better than just passing `pip install cowsay` because it will produce a command that follows the best practice of installing Python packages in Docker images. Docked provides a few most useful convenience functions but not many, we don't want it to be too verbose.
 1. `run=[...]` is a list of Docker instruction describing not how the image should be build but how it will behave when it is run. A good example is [VOLUME](https://docs.docker.com/engine/reference/builder/#volume) which cannot mount volumes when building an image, and so it can be passed in `run=[...]` but not in `build=[...]`
+1. `image.lint()` runs built-in linter that will make sure we follow the best practice of building Docker images.
 1. `print(image)` generates a Dockerfile and prints it into stdout.
 
 Now, pipe it into docker and run the image:
@@ -88,4 +90,7 @@ And you should see Mr. Cow:
 
 ```
 
-You can find more examples in [examples](./examples/) directory.
+## Learn more
+
+1. [docked.orsinium.dev](https://docked.orsinium.dev/) hosts documentation
+1. [examples](./examples/) directory has, you guessed it, examples. All are real and runnable.
