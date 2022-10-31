@@ -92,5 +92,6 @@ And you should see Mr. Cow:
 
 ## Learn more
 
-1. [docked.orsinium.dev](https://docked.orsinium.dev/) hosts documentation
+1. [docked.orsinium.dev](https://docked.orsinium.dev/) hosts documentation.
 1. [examples](./examples/) directory has, you guessed it, examples. All are real and runnable.
+1. You should be able to just install docked and start using it. It has quite good type annotations and docstrings, so let your IDE guide you.
