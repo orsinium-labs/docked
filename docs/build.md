@@ -29,7 +29,7 @@ python3 ./examples/hello_world.py > Dockerfile
 
 ## Image.build
 
-The library provides the `Image.build` method that will generate the Dockerfile for you and pass it into Docker CLI. This is useful when you want the script to automatically build itself but don't want to bring any third-party dependencies.
+The library provides the {py:class}`docked.Image`.build method that will generate the Dockerfile for you and pass it into Docker CLI. This is useful when you want the script to automatically build itself but don't want to bring any third-party dependencies.
 
 ```python
 if __name__ == '__main__':

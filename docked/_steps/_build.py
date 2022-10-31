@@ -159,13 +159,21 @@ class DOWNLOAD(_BaseAdd):
     @property
     def min_version(self) -> str:
         if self.checksum:
-            return 'labs'
+            return 'master-labs'
         return super().min_version
 
 
 @dataclass
 class CLONE(_BaseAdd):
     """Clone a git repository.
+
+    Currently, available only in development channel. So, you'll need to explicitly
+    specify the syntax to use this instruction::
+
+        image = d.Image(
+            stage,
+            syntax_channel='docker/dockerfile-upstream',
+        )
 
     https://docs.docker.com/engine/reference/builder/#adding-a-git-repository-add-git-ref-dir
     """
@@ -179,7 +187,7 @@ class CLONE(_BaseAdd):
 
     @property
     def min_version(self) -> str:
-        return 'labs'
+        return 'master-labs'
 
 
 class EXTRACT(_BaseAdd):
