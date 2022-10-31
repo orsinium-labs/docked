@@ -18,6 +18,14 @@ DEFAULT_CHANNEL = 'docker/dockerfile'
 
 class Image:
     """A Docker image. Consists of one or more Stages.
+
+    Args:
+        *stages: at least one stage. Multiple for multi-stage builds.
+        syntax_channel: the Dockerfile syntax to use. Default: ``docker/dockerfile``.
+        syntax_version: the Dockerfile syntax version to use.
+            If not specified explicitly, will be detected based on the features
+            you use, sticking to the lowest minor version possible.
+        escape: the escape character to use in Dockerfile. Default: ``\\``.
     """
     __slots__ = ('stages', 'syntax_channel', 'syntax_version', 'escape')
 
@@ -48,7 +56,7 @@ class Image:
     def syntax(self) -> str:
         """Syntax of the Dockerfile to use.
 
-        If no `syntax_version` provided, the `min_version` will be used.
+        If no ``syntax_version`` provided, the ``min_version`` will be used.
         """
         version = self.syntax_version or self.min_version
         return f'{self.syntax_channel}:{version}'
@@ -101,6 +109,14 @@ class Image:
         stderr: TextIO = sys.stderr,
     ) -> int:
         """Build the image using syscalls to the Docker CLI.
+
+        Args:
+            args: additional CLI arguments to pass into Docker binary.
+            binary: docker binary to use. Must be either a path or in $PATH.
+            exit_on_failure: set to False to make the method return the exit code
+                as a result instead of calling ``sys.exit`` on failure.
+            stdout: stream to pipe Docker CLI stdout into.
+            stderr: stream to pipe Docker CLI stderr into.
         """
         if args is None:
             args = sys.argv[1:]
@@ -121,6 +137,13 @@ class Image:
         exit_on_failure: bool = True,
     ) -> int:
         """Run linter on the image.
+
+        Args:
+            disable_codes: error codes to skip. Leave it empty by default,
+                add some values into it when you face false-positives.
+            stdout: stream where to write the reported violations.
+            exit_on_failure: set to False to return exit code on failure
+                instead of callin ``sys.exit``.
         """
         count = 0
         for v in lint(self):

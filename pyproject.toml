@@ -31,7 +31,7 @@ dependencies = []
 [project.optional-dependencies]
 test = ["pytest", "pytest-cov"]
 lint = ["isort", "flake8", "unify", "mypy"]
-docs = ["sphinx", "myst-parser", "sphinx-rtd-dark-mode"]
+docs = ["sphinx", "myst-parser"]
 
 [project.urls]
 Source = "https://github.com/orsinium-labs/docked"

@@ -14,6 +14,17 @@ if TYPE_CHECKING:
 
 
 class BaseImage:
+    """Type representing a base image, like the ones you can find on Docker Hub.
+
+    It's used in Stage to specify ``FROM``, in COPY to specify ``--from``
+    and in some ``--mount`` types in ``RUN``.
+
+    Args:
+        name: image name. For example, "python".
+        tag: image tag. For example, "3.11-alpine".
+        digest: the layer has of the image to use. You can find it on Docker Hub.
+            Can't be used together with ``tag``, pick one.
+    """
     __slots__ = ('name', 'tag', 'digest')
 
     def __init__(
@@ -37,6 +48,10 @@ class BaseImage:
 
 class Checksum:
     """Hash of remote content for DOWNLOAD.
+
+    Args:
+        hex: base 16 representation of the hash value.
+        algorithm: the name of algorithm used to obtain the hash.
     """
     __slots__ = ('hex', 'algorithm')
 
@@ -73,6 +88,12 @@ class Mount:
 @dataclass
 class BindMount(Mount):
     """Allows binding directories (read-only) in the context or in an image.
+
+    Args:
+        target: Mount path.
+        source: Source path in the from_stage. Defaults to the root of the from.
+        from_stage: Stage or BaseImage for the root of the source. Defaults to the build context.
+        allow_write: Allow writes on the mount. Written data will be discarded.
 
     https://docs.docker.com/engine/reference/builder/#run---mounttypebind
     """

@@ -11,7 +11,8 @@ def pip_install(*pkgs: str) -> str:
     """Install Python packages from pypi.org.
     """
     suffix = ' '.join(pkgs)
-    return f'python3 -m pip --disable-pip-version-check install {suffix}'
+    flags = '--disable-pip-version-check --no-cache-dir'
+    return f'python3 -m pip {flags} install {suffix}'
 
 
 def apt_install(*pkgs: str) -> str:

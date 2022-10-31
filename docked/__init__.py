@@ -11,6 +11,7 @@ from ._stage import Stage
 from ._steps import (
     ARG, CLONE, CMD, COPY, DOWNLOAD, ENTRYPOINT, ENV, EXPOSE, EXTRACT,
     HEALTHCHECK, ONBUILD, RUN, SHELL, STOPSIGNAL, USER, VOLUME, WORKDIR, Step,
+    BuildStep, RunStep,
 )
 from ._types import (
     BaseImage, BindMount, CacheMount, Checksum, Mount, SecretMount, SSHMount,
@@ -22,11 +23,13 @@ __all__ = [
     # classes and things
     'BaseImage',
     'BindMount',
+    'BuildStep',
     'CacheMount',
     'Checksum',
     'cmd',
     'Image',
     'Mount',
+    'RunStep',
     'SecretMount',
     'SSHMount',
     'Stage',

@@ -11,6 +11,24 @@ if TYPE_CHECKING:
 
 
 class Stage:
+    """A single stage of the build.
+
+    Represents everything from FROM to FROM (or end of file) in Dockerfile.
+
+    Many arguments might appear as they would better fit into Image,
+    but not really. One Image can produce multiple container images
+    when using multi-stage builds. And depending on which Stage you target,
+    the correspoding arguments (like labels) might be different.
+
+    Args:
+        base: base image to use or a previous Stage to start from.
+        name: the Stage name. Must be specified and unique for multi-stage builds.
+        platform: the platform for which to build the image.
+        build: Steps to execute when building the image.
+        run: Steps that affect how container based on the image will be ran.
+        labels: meta information associated with the resulting image.
+            Corresponds to LABEL instruction in Dockerfile.
+    """
     __slots__ = ('name', 'base', 'platform', 'build', 'run', 'labels')
 
     def __init__(
@@ -31,9 +49,15 @@ class Stage:
         self.labels = labels or {}
 
     def as_str(self) -> str:
+        """Represent the stage as valid Dockerfile syntax.
+        """
         return '\n'.join(self.iter_lines())
 
     def iter_lines(self) -> Iterator[str]:
+        """Emit lines of Dockerfile one-by-one.
+
+        Useful for generating big stages without putting too much into memory.
+        """
         yield self._from
         yield from self._labels
         step: Step
@@ -44,11 +68,15 @@ class Stage:
 
     @property
     def all_steps(self) -> Iterator[Step]:
+        """Iterate over all steps, from both ``build`` and ``run``.
+        """
         yield from self.build
         yield from self.run
 
     @property
     def min_version(self) -> str:
+        """The minimal syntax version required for the Stage.
+        """
         versions = (step.min_version for step in chain(self.build, self.run))
         return max(versions, default='1.0')
 
