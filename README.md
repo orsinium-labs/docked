@@ -15,7 +15,7 @@ A human-friendly alternative to Dockerfile. It's a Python library for generating
 
 ## Why
 
-The Dockerfile already exists, and yet we made this project. THere are many good reasons for that:
+The Dockerfile already exists, and yet we made this project. There are many good reasons for that:
 
 + Python is powerful. You get loops, conditions, environment variables, command-line tools, and a lot of other cool stuff that Dockerfile will never get.
 + Python has a great tooling. You get linters, type-checker, autoformatters, debugger, autoomplete, syntax highlighting, and so on to make your code easy to write, read, and maintain.
